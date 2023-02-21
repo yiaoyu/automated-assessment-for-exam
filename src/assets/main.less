@@ -1,0 +1,64 @@
+@import "./base.less";
+// 切入切出动画
+.v-enter-active,
+.v-leave-active {
+transition: opacity 0.5s ease;
+}
+.v-enter-from,
+.v-leave-to {
+opacity: 0;
+}
+// //自定义滚动框
+// ::-webkit-scrollbar{
+//     background-color: @background-color-light-1;
+//     border-radius: 5px;
+// }
+// ::-webkit-scrollbar-thumb{
+//     background: linear-gradient(rgba(52, 152, 219,1.0),rgba(41, 128, 185,1.0));
+//     border-radius: 5px;
+// }
+// ::-webkit-scrollbar-corner{
+//     background-color: @background-color-light-1;
+// }
+//链接颜色
+a:link{
+    color: @font-color;
+    text-decoration: none;
+}
+a:visited{
+    color: @font-color;
+}
+a:hover{
+    color: @main-color;
+}
+a:active{
+    color: @main-color-light;
+}
+//默认样式
+*{
+    color: @font-color;
+}
+body{
+    margin:0;
+}
+button{
+    border: none;
+    color:@font-color-white;
+    background-color: transparent;
+    font-size: 1rem;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background-color: @main-color-light;
+}
+button:hover{
+    cursor: pointer;
+    background-color: @main-color-hover;
+}
+input{
+    border: none;
+    outline-style: none;
+    background-color: transparent;
+    font-size: 1rem;
+    color:@font-color;
+}

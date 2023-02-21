@@ -17,5 +17,6 @@ onMounted(() => {
   <RouterView />
 </template>
 
-<style scoped>
+<style scoped lang="less">
+
 </style>
