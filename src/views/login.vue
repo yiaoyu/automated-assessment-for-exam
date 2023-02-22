@@ -1,7 +1,106 @@
 <script setup lang="ts">
-  import { RouterLink} from "vue-router";
-  import { ref } from "vue";
-  const currentLoginOption = ref("student");
+  import { RouterLink} from "vue-router"
+  import { ref,watch,onMounted,onBeforeUnmount,computed } from "vue"
+  import { Base64 } from 'js-base64';
+  const currentLoginOption = ref("student")
+  const userName=ref("")
+  const userPwd=ref("")
+  const regName=ref("")
+  const regPwd=ref("")
+  const confirmPwd=ref("")
+  const regType=ref("")
+  const regBtnName=computed(()=>{
+    if(regType.value=="student"){
+      return "学生注册"
+    }else{
+      return "教师注册"
+    }
+  })
+  const remmeberAccount=ref(false)
+  const showPwd=ref(false)
+  //保存账户
+  watch(remmeberAccount,saveAccount)
+  function saveAccount(){
+    if(remmeberAccount.value==true){
+      localStorage.setItem("userName",Base64.encode(userName.value))
+      localStorage.setItem("userPwd",Base64.encode(userPwd.value))
+    }else{
+      localStorage.removeItem("userName")
+      localStorage.removeItem("userPwd")
+    }
+  }
+  onMounted(() => {
+    if(localStorage.getItem("userName")){
+      userName.value = Base64.decode(localStorage.getItem("userName")!)
+      userPwd.value = Base64.decode(localStorage.getItem("userPwd")!)
+      remmeberAccount.value = true
+    }
+  })
+  onBeforeUnmount(() => {
+    if(remmeberAccount.value){
+      localStorage.setItem("userName",Base64.encode(userName.value))
+      localStorage.setItem("userPwd",Base64.encode(userPwd.value))
+    }
+  })
+  //用户注册
+  function register(){
+    if(regName.value==""){
+      window.alert("请输入名称")
+      return
+    }
+    if(regPwd.value==""){
+      window.alert("请输入密码")
+      return
+    }
+    if(regPwd.value!==confirmPwd.value){
+      window.alert("两次输入密码不一致，请重新输入")
+      regPwd.value = ""
+      confirmPwd.value = ""
+      return
+    }
+    fetch(`/api/register?userName=${regName.value}&userPwd=${regPwd.value}&userType=${regType.value}`).then(v=>{
+      return v.text()
+    }).then(v=>{
+      switch(v){
+        case "success":window.alert("注册成功！");break;
+        case "ER_DUP_ENTRY":window.alert("该名称已被使用！");break;
+        default: window.alert(v)
+      }
+    }).catch(err=>{
+      console.log(err);
+    });
+  }
+  //登录
+  function login(type:string){
+    if(userName.value==""){
+      window.alert("请输入名称")
+      return
+    }
+    if(userPwd.value==""){
+      window.alert("请输入密码")
+      return
+    }
+    fetch(`/api/login?userName=${userName.value}&userPwd=${userPwd.value}&userType=${type}`).then(v=>{
+      return v.json()
+    }).then(v=>{
+      switch(v.msg){
+        case "success":
+          console.log(v.token)
+          localStorage.setItem("token",v.token)
+          if(type=="student"){
+            window.location.replace("http://localhost:5500/student")
+          }else{
+            window.location.replace("http://localhost:5500/teacher")
+          }
+          break
+        case "wrong_password":window.alert("密码错误");break;
+        case "name_not_find":window.alert("找不到该用户");break;
+        default: window.alert(v)
+      }
+    }).catch(err=>{
+      console.log(err);
+    });
+  }
 </script>
 
 <template>
@@ -15,35 +114,42 @@
       <div class="login-input-view" v-if="currentLoginOption=='student'||currentLoginOption=='teacher'">
         <div class="input-container">
           <span>名称：</span>
-          <input>
+          <input v-model="userName">
         </div>
         <div class="input-container">
           <span>密码：</span>
-          <input type="password">
+          <input type="password" v-model="userPwd" v-if="!showPwd">
+          <input type="text" v-model="userPwd" v-if="showPwd">
         </div>
         <div class="input-control">
-          <input type="checkbox" class="remember">
-          <label for="remember">保存账户</label>
-          <input type="checkbox" class="show-pwd">
+          <input type="checkbox" class="remember" v-model="remmeberAccount">
+          <label for="remember">记住账户</label>
+          <input type="checkbox" class="show-pwd" v-model="showPwd">
           <label for="show-pwd">显示密码</label>
         </div>
-        <button class="confirm-btn" v-if="currentLoginOption=='student'">登录</button>
-        <button id="teacher-login-btn" class="confirm-btn" v-if="currentLoginOption=='teacher'">教师登录</button>
+        <button class="confirm-btn" v-if="currentLoginOption=='student'" @click="login('student')">学生登录</button>
+        <button id="teacher-login-btn" class="confirm-btn" v-if="currentLoginOption=='teacher'" @click="login('teacher')">教师登录</button>
       </div>
       <div id="register-input-view" class="login-input-view" v-if="currentLoginOption=='register'" >
         <div class="input-container">
           <span>名称：</span>
-          <input>
+          <input v-model="regName">
         </div>
         <div class="input-container">
           <span>密码：</span>
-          <input type="password">
+          <input type="password" v-model="regPwd">
         </div>
         <div class="input-container">
           <span>确认密码：</span>
-          <input type="password" id="confirmPwd">
+          <input type="password" id="confirmPwd" v-model="confirmPwd">
         </div>
-        <button class="confirm-btn">注册</button>
+        <div class="input-control">
+          <input type="radio" id="isStudent" value="student" v-model="regType"/>
+          <label for="isStudent">我是学生</label>
+          <input type="radio" id="isTeacher" value="teacher" v-model="regType" />
+          <label for="isTeacher">我是教师</label>
+        </div>
+        <button class="confirm-btn" @click="register" v-if="regType!=''">{{regBtnName}}</button>
       </div>
     </section>
   </div>
@@ -131,7 +237,7 @@
         height: 26rem;
       }
     }
-    #login-box:hover{
+    .login-box:hover{
       box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
     }
     .register{
