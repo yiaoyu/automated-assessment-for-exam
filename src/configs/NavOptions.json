@@ -1,0 +1,14 @@
+{
+    "studentInfo":[
+        {
+            "id":0,
+            "title":"修改个人信息"
+        }
+    ],
+    "teacherInfo":[
+        {
+            "id":0,
+            "title":"修改个人信息"
+        }
+    ]
+}

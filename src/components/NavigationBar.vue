@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { mainStore } from "../stores/main"
+  import navOptions from "../configs/NavOptions.json"
   defineProps<{
     class: string;
   }>();
@@ -7,16 +8,25 @@
 </script>
 
 <template>
-  <!-- <section v-if="store.currentNav == 'info'">
-    
-  </section> -->
   <div class="nav-bar">
-    <input type="search" id="nav-search" placeholder="搜索...">
-    <button>增加新试卷</button>
-    <div class="list">
-      <div class="item">期初测试</div>
-      <div class="item">期末测试</div>
-      <div class="item">计算机测试</div>
+    <input type="search" id="nav-search" placeholder="搜索..." 
+    v-if="store.currentNav!='studentInfo'&&store.currentNav!='teacherInfo'">
+    <!-- <button>增加新试卷</button> -->
+    <div class="list" v-if="store.currentNav=='studentInfo'">
+      <div class="item" v-for="option in navOptions.studentInfo" 
+      :key="option.id" 
+      @click="store.currentItem=option.id" 
+      :class="{selected:store.currentItem==option.id}">
+        {{ option.title }}
+      </div>
+    </div>
+    <div class="list" v-if="store.currentNav=='teacherInfo'">
+      <div class="item" v-for="option in navOptions.teacherInfo" 
+      :key="option.id" 
+      @click="store.currentItem=option.id" 
+      :class="{selected:store.currentItem==option.id}">
+        {{ option.title }}
+      </div>
     </div>
   </div>
 </template>
@@ -43,14 +53,16 @@
         padding: 0.5rem;
       }
       .item:hover{
-        background-color: @main-color-hover;
+        background-color: @sec-color-hover;
+        color:@font-color-white;
         cursor: pointer;
       }
-      .active{
-        background-color: @main-color;
+      .selected{
+        background-color: @sec-color;
+        color:@font-color-white;
       }
-      .active:hover{
-        background-color: @main-color;
+      .selected:hover{
+        background-color: @sec-color;
         cursor: pointer;
       }
     }

@@ -1,7 +1,10 @@
 <script setup lang="ts">
-  import { RouterLink} from "vue-router"
+  import { RouterLink,useRouter } from "vue-router"
   import { ref,watch,onMounted,onBeforeUnmount,computed } from "vue"
   import { Base64 } from 'js-base64';
+  import { mainStore } from "../stores/main"
+  const store = mainStore()
+  const router = useRouter()
   const currentLoginOption = ref("student")
   const userName=ref("")
   const userPwd=ref("")
@@ -47,11 +50,18 @@
     if(regName.value==""){
       window.alert("请输入名称")
       return
+    }else if(store.hasIllegalChar(regName.value)){
+      window.alert("名称包含非法字符")
+      return
     }
     if(regPwd.value==""){
       window.alert("请输入密码")
       return
+    }else if(store.hasIllegalChar(regPwd.value)){
+      window.alert("密码包含非法字符")
+      return
     }
+
     if(regPwd.value!==confirmPwd.value){
       window.alert("两次输入密码不一致，请重新输入")
       regPwd.value = ""
@@ -85,12 +95,18 @@
     }).then(v=>{
       switch(v.msg){
         case "success":
-          console.log(v.token)
+          localStorage.setItem("id",v.id)
+          localStorage.setItem("name",v.name)
+          localStorage.setItem("school",v.school)
+          localStorage.setItem("class",v.class)
+          localStorage.setItem("department",v.department)
           localStorage.setItem("token",v.token)
           if(type=="student"){
-            window.location.replace("http://localhost:5500/student")
+            store.userType = "student"
+            router.push('/student')
           }else{
-            window.location.replace("http://localhost:5500/teacher")
+            store.userType = "teacher"
+            router.push('/teacher')
           }
           break
         case "wrong_password":window.alert("密码错误");break;

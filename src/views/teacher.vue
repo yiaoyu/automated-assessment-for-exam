@@ -6,6 +6,11 @@
   import { onBeforeMount } from "vue"
   const store = mainStore()
   onBeforeMount(() => {
+    store.userId = parseInt(localStorage.getItem("id")!)
+    store.userName = localStorage.getItem("name")!
+    store.userSchool = localStorage.getItem("school")!
+    store.userClass = localStorage.getItem("class")!
+    store.userDepartment = localStorage.getItem("department")!
     if(localStorage.getItem("token")){
       fetch(`/api/verify`, { 
         method: 'post', 
