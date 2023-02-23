@@ -2,6 +2,7 @@
   import { mainStore } from "../stores/main"
   import { onBeforeMount,ref } from "vue"
   import Setting from "./Setting.vue"
+  import EditPaper from "./EditPaper.vue"
   defineProps<{
     id: string;
   }>();
@@ -9,9 +10,16 @@
 </script>
 
 <template>
-  <div class="content-container" id="student-info1" v-if="store.currentNav=='studentInfo'&&store.currentItem==0">
+  <div class="content-container" v-if="store.currentNav=='studentInfo'&&store.currentItem==0">
     <Setting/>
   </div>
+  <div class="content-container" v-if="store.currentNav=='teacherInfo'&&store.currentItem==0">
+    <Setting/>
+  </div>
+  <div class="content-container" v-if="store.currentNav=='edit'">
+    <EditPaper/>
+  </div>
+
   <!-- <header>
     <h1 class="header-title">期末考试</h1>
     <h3 class="header-time-limit">考试时间</h3>

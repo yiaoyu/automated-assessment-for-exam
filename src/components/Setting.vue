@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { mainStore } from "../stores/main"
-  import { onBeforeMount,ref } from "vue"
+  import { ref } from "vue"
+  import { Base64 } from 'js-base64';
   const store = mainStore()
   const newName = ref(store.userName)
   const newSchool = ref(store.userSchool)
@@ -66,6 +67,10 @@
           break
         default: window.alert(v)
       }
+      localStorage.setItem("name",v.name)
+      localStorage.setItem("school",v.school)
+      localStorage.setItem("class",v.class)
+      localStorage.setItem("department",v.department)
       newName.value = store.userName
       newSchool.value = store.userSchool
       newDepartment.value = store.userDepartment
@@ -109,6 +114,7 @@
           break
         default: window.alert(v)
       }
+      localStorage.setItem("userPwd",Base64.encode(v.newPwd))
       currentPwd.value = ""
       newPwd.value = ""
     }).catch(err=>{
@@ -118,7 +124,7 @@
 </script>
 
 <template>
-  <div class="content-container" id="student-info1" v-if="store.currentNav=='studentInfo'&&store.currentItem==0">
+  <div class="setting-container" id="student-setting1" v-if="store.currentNav=='studentInfo'&&store.currentItem==0">
     <div class="change-info">
       <div>用户序号：{{store.userId}}</div>
       <div>
@@ -147,7 +153,7 @@
       <button @click="changePwd">确认修改</button>
     </div>
   </div>
-  <div class="content-container" id="teacher-info1" v-if="store.currentNav=='teacherInfo'&&store.currentItem==0">
+  <div class="setting-container" id="teacher-setting1" v-if="store.currentNav=='teacherInfo'&&store.currentItem==0">
     <div class="change-info">
       <div>用户序号：{{store.userId}}</div>
       <div>

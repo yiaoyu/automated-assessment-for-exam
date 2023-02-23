@@ -6,38 +6,11 @@
   import { onBeforeMount } from "vue"
   const store = mainStore()
   onBeforeMount(() => {
-    store.userId = parseInt(localStorage.getItem("id")!)
-    store.userName = localStorage.getItem("name")!
-    store.userSchool = localStorage.getItem("school")!
-    store.userClass = localStorage.getItem("class")!
-    store.userDepartment = localStorage.getItem("department")!
-    if(localStorage.getItem("token")){
-      fetch(`/api/verify`, { 
-        method: 'post', 
-        headers: new Headers({
-          'Authorization': localStorage.getItem("token")!,
-          'Content-Type': 'application/json'
-        }),
-        body: JSON.stringify({type:'teacher'})
-        //body 必须使用JSON格式
-      }).then(v=>{
-        return v.json()
-      }).then(v=>{
-        switch(v.msg){
-          case "token_verify_success":
-            //身份验证通过
-            break
-          case "token_verify_fail":
-            window.location.replace("http://localhost:5500")
-            break
-          default: window.alert(v)
-        }
-      }).catch(err=>{
-        console.log(err);
-      });
-    }else{
-      window.location.replace("http://localhost:5500")
-    }
+    store.loadLocalStore()
+    store.tokenCheck('teacher')
+    //获取所有试卷
+    store.getAllPaper()
+    //获取所有考试
   })
 </script>
 

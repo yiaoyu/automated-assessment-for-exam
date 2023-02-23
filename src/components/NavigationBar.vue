@@ -5,13 +5,43 @@
     class: string;
   }>();
   const store = mainStore()
+  //增加试卷
+  function addPaper(){
+    fetch(`/api/addpaper`,{
+      method: 'post', 
+      headers: new Headers({
+        'Authorization': localStorage.getItem("token")!,
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify({
+        tid:store.userId,
+        title:"新建试卷",
+        type:"exam"
+      })
+    }).then(v=>{
+      return v.json()
+    }).then(v=>{
+      switch(v.msg){
+        case "success":
+          store.getAllPaper()
+          break
+        case "fail":
+          window.alert("添加失败")
+          break
+        default: window.alert(v)
+      }
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
 </script>
 
 <template>
   <div class="nav-bar">
     <input type="search" id="nav-search" placeholder="搜索..." 
     v-if="store.currentNav!='studentInfo'&&store.currentNav!='teacherInfo'">
-    <!-- <button>增加新试卷</button> -->
+    <button v-if="store.currentNav=='edit'" @click="addPaper">增加新试卷</button>
+    <!-- 学生信息 -->
     <div class="list" v-if="store.currentNav=='studentInfo'">
       <div class="item" v-for="option in navOptions.studentInfo" 
       :key="option.id" 
@@ -20,12 +50,46 @@
         {{ option.title }}
       </div>
     </div>
+    <!-- 教师信息 -->
     <div class="list" v-if="store.currentNav=='teacherInfo'">
       <div class="item" v-for="option in navOptions.teacherInfo" 
       :key="option.id" 
       @click="store.currentItem=option.id" 
       :class="{selected:store.currentItem==option.id}">
         {{ option.title }}
+      </div>
+    </div>
+    <!-- 编辑试卷 -->
+    <div class="list" v-if="store.currentNav=='edit'">
+      <div class="item" v-for="paper in store.papers"
+      :key="paper.id" 
+      @click="store.currentPaperId=paper.id" 
+      :class="{selected:store.currentPaperId==paper.id}">
+        {{paper.title}}
+      </div>
+    </div>
+    <!-- 查看结果 -->
+    <div class="list" v-if="store.currentNav=='view'">
+      <div class="item">
+        查看结果
+      </div>
+    </div>
+    <!-- 练习 -->
+    <div class="list" v-if="store.currentNav=='exercise'">
+      <div class="item">
+        练习
+      </div>
+    </div>
+    <!-- 考试 -->
+    <div class="list" v-if="store.currentNav=='exam'">
+      <div class="item">
+        考试
+      </div>
+    </div>
+    <!-- 成绩 -->
+    <div class="list" v-if="store.currentNav=='score'">
+      <div class="item">
+        成绩
       </div>
     </div>
   </div>
