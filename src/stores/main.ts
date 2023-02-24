@@ -11,6 +11,7 @@ export const mainStore = defineStore("main", () => {
   const userDepartment=ref("")
   const userType=ref("")
   const papers:entity.paper[] = reactive([])
+  const questions:entity.question[] = reactive([])
   const currentPaperId = ref(0)
   // 模板
   // function getAllPaper(){
@@ -112,6 +113,7 @@ export const mainStore = defineStore("main", () => {
 
   function getAllquestion(pid:number){
     //获取试卷中的题目
+    questions.length = 0
     fetch(`/api/getallquestion`,{
       method: 'post', 
       headers: new Headers({
@@ -126,9 +128,10 @@ export const mainStore = defineStore("main", () => {
     }).then(v=>{
       switch(v.msg){
         case "success":
-          console.log(v.data)
+          questions.push(...v.data)
           break
         case "fail":
+          window.alert(v)
           break
         default: window.alert(v)
       }
@@ -147,6 +150,7 @@ export const mainStore = defineStore("main", () => {
     currentItem,
     currentPaperId,
     papers,
+    questions,
     hasIllegalChar,
     tokenCheck,
     loadLocalStore,
