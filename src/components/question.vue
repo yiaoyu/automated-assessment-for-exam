@@ -5,7 +5,7 @@
   const store = mainStore()
   const questions:question[] = reactive([])
   watch(() => store.currentPaperId, (n) => {
-    questions.push(...store.getAllquestion(n))
+    store.getAllquestion(n)
   });
 </script>
 

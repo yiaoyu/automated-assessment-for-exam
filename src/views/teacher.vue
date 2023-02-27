@@ -10,7 +10,6 @@
     store.tokenCheck('teacher')
     //获取所有试卷
     store.getAllPaper()
-    //获取所有考试
   })
 </script>
 

@@ -2,7 +2,7 @@ export interface paper{
     id:number
     tid:number
     title:string
-    releaseTime?:number
+    releaseTime?:string
     timeLimit?:number
     type?:string
 }
@@ -16,8 +16,8 @@ export interface question{
 export interface exam{
     sid:number
     pid:number
-    startTime?:number
-    finishTime?:number
+    startTime?:string
+    finishTime?:string
 }
 export interface answer{
     sid:number

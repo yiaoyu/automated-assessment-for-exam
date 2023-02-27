@@ -2,17 +2,31 @@ import { ref, reactive } from "vue";
 import { defineStore } from "pinia";
 import type * as entity from "../stores/entity"
 export const mainStore = defineStore("main", () => {
+  //flag
   const currentNav = ref("")//当前导航栏
-  const currentItem = ref(0)//当前导航选项
+  const currentItem = ref(0)//当前的设置选项（只在setting中使用）
+  const currentPaperId = ref(0)//当前选择的试卷号
+  //用户基本信息
   const userName=ref("")
   const userId=ref(0)
   const userSchool=ref("")
   const userClass=ref("")
   const userDepartment=ref("")
   const userType=ref("")
+  //学生考试数据
+  const currentExam:entity.exam = reactive({
+    sid:0,
+    pid:0,
+    startTime:"",
+    finishTime:"",
+  })
+  const currentAnswers:entity.answer[] = reactive([])
+  const hasCreatedAnswer=ref(false)
+  //数据库数据
   const papers:entity.paper[] = reactive([])
   const questions:entity.question[] = reactive([])
-  const currentPaperId = ref(0)
+  const answers:entity.answer[] = reactive([])
+  const exams:entity.exam[] = reactive([])
   // 模板
   // function getAllPaper(){
   //   fetch(`/api/`,{
@@ -139,22 +153,55 @@ export const mainStore = defineStore("main", () => {
       console.log(err)
     })
   }
+  //查找对应的页面
+  function getPaperPage(id:number):number{
+    for (let i = 0; i < papers.length; i++) {
+      if(papers[i].id == id){
+        return i
+      }
+    }
+    console.log("main.ts getPaperPage:找不到对应页面！")
+    return 0
+  }
+  //查找考试中的题目
+  function getCurrentAnswer(id:number):number{
+    for (let i = 0; i < currentAnswers.length; i++) {
+      if(currentAnswers[i].qid == id){
+        return i
+      }
+    }
+    console.log("main.ts getCurrentAnswer:找不到对应页面！")
+    return 0
+  }
+  //获取mysql格式的datetime
+  function getDateTime():string{
+    let date:string = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    return date
+  }
   return { 
+    currentNav,
+    currentItem,
+    currentPaperId,
     userName,
     userId,
     userSchool,
     userClass,
     userDepartment,
     userType,
-    currentNav,
-    currentItem,
-    currentPaperId,
+    currentExam,
+    currentAnswers,
+    hasCreatedAnswer,
     papers,
     questions,
+    answers,
+    exams,
     hasIllegalChar,
     tokenCheck,
     loadLocalStore,
     getAllPaper,
-    getAllquestion
+    getAllquestion,
+    getPaperPage,
+    getCurrentAnswer,
+    getDateTime
    }
 });

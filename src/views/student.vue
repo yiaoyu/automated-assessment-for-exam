@@ -8,6 +8,8 @@
   onBeforeMount(() => {
     store.loadLocalStore()
     store.tokenCheck('student')
+    //获取所有试卷
+    store.getAllPaper()
   })
 </script>
   
