@@ -19,6 +19,9 @@ export const mainStore = defineStore("main", () => {
     pid:0,
     startTime:"",
     finishTime:"",
+    score:0,
+    public:"yes",
+    times:0
   })
   const currentAnswers:entity.answer[] = reactive([])
   const hasCreatedAnswer=ref(false)
@@ -44,6 +47,7 @@ export const mainStore = defineStore("main", () => {
   //       case "success":
   //         break
   //       case "fail":
+  //         window.alert("")
   //         break
   //       default: window.alert(v)
   //     }
@@ -155,12 +159,15 @@ export const mainStore = defineStore("main", () => {
   }
   //查找对应的页面
   function getPaperPage(id:number):number{
+    if(id == 0){
+      return 0
+    }
     for (let i = 0; i < papers.length; i++) {
       if(papers[i].id == id){
         return i
       }
     }
-    console.log("main.ts getPaperPage:找不到对应页面！")
+    console.log("getPaperPage:找不到对应页面！")
     return 0
   }
   //查找考试中的题目
@@ -170,13 +177,23 @@ export const mainStore = defineStore("main", () => {
         return i
       }
     }
-    console.log("main.ts getCurrentAnswer:找不到对应页面！")
+    console.log("getCurrentAnswer:找不到对应页面！")
     return 0
   }
   //获取mysql格式的datetime
   function getDateTime():string{
     let date:string = new Date().toISOString().slice(0, 19).replace('T', ' ');
     return date
+  }
+  //根据学生答案获取原题
+  function getQuestionIdByAnswer(qid:number):number{
+    for (let i = 0; i < questions.length; i++) {
+      if(currentAnswers[i].qid == qid){
+        return i
+      }
+    }
+    console.log("main.ts getQuestionIdByAnswer:找不到对应题目！")
+    return 0
   }
   return { 
     currentNav,
@@ -202,6 +219,7 @@ export const mainStore = defineStore("main", () => {
     getAllquestion,
     getPaperPage,
     getCurrentAnswer,
-    getDateTime
+    getDateTime,
+    getQuestionIdByAnswer
    }
 });

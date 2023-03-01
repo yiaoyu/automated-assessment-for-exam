@@ -5,6 +5,7 @@ export interface paper{
     releaseTime?:string
     timeLimit?:number
     type?:string
+    maxTimes?:number
 }
 export interface question{
     id:number
@@ -18,6 +19,10 @@ export interface exam{
     pid:number
     startTime?:string
     finishTime?:string
+    score?:number
+    public?:string
+    times?:number
+    name?:string
 }
 export interface answer{
     sid:number

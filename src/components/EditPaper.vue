@@ -27,6 +27,7 @@
           case "success":
             break
           case "fail":
+            window.alert(v)
             break
           default: window.alert(v)
         }
@@ -55,6 +56,7 @@
           store.getAllquestion(store.currentPaperId)
           break
         case "fail":
+          window.alert(v)
           break
         default: window.alert(v)
       }
@@ -132,11 +134,11 @@
           'Content-Type': 'application/json'
         }),
         body: JSON.stringify({
-          //title=?,releaseTime=?,timeLimit=?,type=? WHERE id=?;
           title:store.papers[store.getPaperPage(store.currentPaperId)].title,
           releaseTime:store.papers[store.getPaperPage(store.currentPaperId)].releaseTime,
           timeLimit:store.papers[store.getPaperPage(store.currentPaperId)].timeLimit,
           type:store.papers[store.getPaperPage(store.currentPaperId)].type,
+          maxTimes:store.papers[store.getPaperPage(store.currentPaperId)].maxTimes,
           id:store.currentPaperId
         })
       }).then(v=>{
@@ -180,6 +182,10 @@
     <div class="paper-setting">
       <div>时间限制</div>
       <input type="text" v-model="store.papers[store.getPaperPage(store.currentPaperId)].timeLimit">
+    </div>
+    <div class="paper-setting">
+      <div>次数限制</div>
+      <input type="text" v-model="store.papers[store.getPaperPage(store.currentPaperId)].maxTimes">
     </div>
     <div class="paper-setting">
       <div>类型</div>

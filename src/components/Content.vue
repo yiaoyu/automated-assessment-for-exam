@@ -4,6 +4,8 @@
   import Setting from "./Setting.vue"
   import EditPaper from "./EditPaper.vue"
   import Exam from './Exam.vue'
+  import Result from './Result.vue'
+  import Review from './Review.vue'
   defineProps<{
     id: string;
   }>();
@@ -26,12 +28,19 @@
   <div class="content-container" v-if="store.currentNav=='exam'">
     <Exam/>
   </div>
+  <div class="content-container" v-if="store.currentNav=='review'">
+    <Review/>
+  </div>
+  <div class="content-container" v-if="store.currentNav=='result'">
+    <Result/>
+  </div>
 </template>
 
 <style scoped lang="less">
   @import "../assets/base.less";
   .content-container{
     min-height: 50rem;
+    height: 100%;
     margin-top: 4rem;
     margin-left: 24rem;
     width:100%;

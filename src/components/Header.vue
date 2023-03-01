@@ -1,9 +1,14 @@
 <script setup lang="ts">
   import { mainStore } from "../stores/main"
+  import { ref,reactive,watch } from "vue"
   defineProps<{
     type: string;
   }>();
   const store = mainStore()
+  watch(()=>store.currentNav,(nav)=>{
+    store.currentPaperId=0
+    store.currentItem=0
+  })
   function changeNav(name:string){
     store.currentItem = 0
     store.currentNav = name
@@ -15,12 +20,12 @@
     <button @click="changeNav('studentInfo')" :class="{ active: store.currentNav=='studentInfo' }">个人信息</button>
     <button @click="changeNav('exercise')" :class="{ active: store.currentNav=='exercise' }">练习</button>
     <button @click="changeNav('exam')" :class="{ active: store.currentNav=='exam' }">考试</button>
-    <button @click="changeNav('score')"  :class="{ active: store.currentNav=='score' }">成绩</button>
+    <button @click="changeNav('result')"  :class="{ active: store.currentNav=='result' }">成绩</button>
   </div>
   <div class="header" v-if="type=='teacher'">
     <button @click="changeNav('teacherInfo')" :class="{ active: store.currentNav=='teacherInfo' }">个人信息</button>
     <button @click="changeNav('edit')" :class="{ active: store.currentNav=='edit' }">编辑试题</button>
-    <button @click="changeNav('view')" :class="{ active: store.currentNav=='view' }">查看结果</button>
+    <button @click="changeNav('review')" :class="{ active: store.currentNav=='review' }">查看结果</button>
   </div>
 </template>
 

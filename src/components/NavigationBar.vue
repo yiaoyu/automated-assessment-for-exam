@@ -40,7 +40,7 @@
   <div class="nav-bar">
     <input type="search" id="nav-search" placeholder="搜索..." 
     v-if="store.currentNav!='studentInfo'&&store.currentNav!='teacherInfo'">
-    <button v-if="store.currentNav=='edit'" @click="addPaper">增加新试卷</button>
+    <button v-if="store.currentNav=='edit'" @click="addPaper" class="add-btn">增加新试卷</button>
     <!-- 学生信息 -->
     <div class="list" v-if="store.currentNav=='studentInfo'">
       <div class="items" v-for="option in navOptions.studentInfo" 
@@ -72,9 +72,13 @@
       </div>
     </div>
     <!-- 查看结果 -->
-    <div class="list" v-if="store.currentNav=='view'">
-      <div class="items">
-        查看结果
+    <div class="list" v-if="store.currentNav=='review'">
+      <div class="items" v-for="paper in store.papers"
+      :key="paper.id" 
+      @click="store.currentPaperId=paper.id">
+        <div class="item" :class="{selected:store.currentPaperId==paper.id}">
+          {{ paper.title }}
+        </div>
       </div>
     </div>
     <!-- 练习 -->
@@ -99,7 +103,7 @@
       </div>
     </div>
     <!-- 成绩 -->
-    <div class="list" v-if="store.currentNav=='score'">
+    <div class="list" v-if="store.currentNav=='result'">
       <div class="items">
         成绩
       </div>
@@ -110,9 +114,10 @@
 <style scoped lang="less">
   @import "../assets/base.less";
   .nav-bar{
-    min-height: 50rem;
+    min-height: 36rem;
+    height: 100%;
     width: 24rem;
-    background-color: @background-color;
+    background-color: @background-color-silver;
     box-shadow: 0 2px 4px rgba(0,0,0,0.12), 0 2px 3px rgba(0,0,0,0.24);
     position: absolute;
     z-index: 2;
@@ -121,6 +126,9 @@
       background-color: @input-background-color;
       width:24rem;
       padding: 1rem;
+    }
+    .add-btn{
+      height: 3rem;
     }
     .list{
       display: flex;
