@@ -104,8 +104,13 @@
     </div>
     <!-- 成绩 -->
     <div class="list" v-if="store.currentNav=='result'">
-      <div class="items">
-        成绩
+      <div class="items" v-for="exam in store.exams"
+      :key="exam.pid"
+      @click="store.currentPaperId=exam.pid"
+      :class="{selected:store.currentPaperId==exam.pid}">
+        <div v-if="exam.public=='yes'" class="item" :class="{selected:store.currentPaperId==exam.pid}">
+          {{exam.title}}
+        </div>
       </div>
     </div>
   </div>

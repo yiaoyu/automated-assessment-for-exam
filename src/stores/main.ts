@@ -6,6 +6,7 @@ export const mainStore = defineStore("main", () => {
   const currentNav = ref("")//当前导航栏
   const currentItem = ref(0)//当前的设置选项（只在setting中使用）
   const currentPaperId = ref(0)//当前选择的试卷号
+  const currentStudentId = ref(0)//当前学生的id
   //用户基本信息
   const userName=ref("")
   const userId=ref(0)
@@ -30,6 +31,7 @@ export const mainStore = defineStore("main", () => {
   const questions:entity.question[] = reactive([])
   const answers:entity.answer[] = reactive([])
   const exams:entity.exam[] = reactive([])
+  const studentAnswers:entity.answer[] = reactive([])
   // 模板
   // function getAllPaper(){
   //   fetch(`/api/`,{
@@ -157,6 +159,36 @@ export const mainStore = defineStore("main", () => {
       console.log(err)
     })
   }
+  //获取某位学生的回答
+  function getAnswers(sid:number,pid:number){
+    currentStudentId.value = sid
+    fetch(`/api/selectanswerbysidpid`,{
+      method: 'post', 
+      headers: new Headers({
+        'Authorization': localStorage.getItem("token")!,
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify({
+        sid:sid,
+        pid:pid
+      })
+    }).then(v=>{
+      return v.json()
+    }).then(v=>{
+      switch(v.msg){
+        case "success":
+          studentAnswers.length=0
+          studentAnswers.push(...v.data)
+          break
+        case "fail":
+          window.alert(v.msg)
+          break
+        default: window.alert(v)
+      }
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
   //查找对应的页面
   function getPaperPage(id:number):number{
     if(id == 0){
@@ -199,6 +231,7 @@ export const mainStore = defineStore("main", () => {
     currentNav,
     currentItem,
     currentPaperId,
+    currentStudentId,
     userName,
     userId,
     userSchool,
@@ -212,14 +245,16 @@ export const mainStore = defineStore("main", () => {
     questions,
     answers,
     exams,
+    studentAnswers,
     hasIllegalChar,
     tokenCheck,
     loadLocalStore,
     getAllPaper,
     getAllquestion,
+    getAnswers,
     getPaperPage,
     getCurrentAnswer,
     getDateTime,
-    getQuestionIdByAnswer
+    getQuestionIdByAnswer,
    }
 });

@@ -4,10 +4,10 @@
   import { ref,reactive,watch } from "vue"
   const store = mainStore()
   const studentExams:entity.exam[] = reactive([]) 
-  const studentAnswers:entity.answer[] = reactive([])
-  const currentStudentId = ref(0)
   watch(() => store.currentPaperId, (pid) => {
-    currentStudentId.value = 0
+    store.currentStudentId = 0
+    studentExams.length = 0
+    store.studentAnswers.length = 0
     store.getAllquestion(pid)
     getExamByPid(pid)
   });
@@ -39,48 +39,49 @@
       console.log(err)
     })
   }
-  //获取某位学生的回答
-  function getAnswers(sid:number,pid:number){
-    currentStudentId.value = sid
-    fetch(`/api/selectanswerbysidpid`,{
-      method: 'post', 
-      headers: new Headers({
-        'Authorization': localStorage.getItem("token")!,
-        'Content-Type': 'application/json'
-      }),
-      body: JSON.stringify({
-        sid:sid,
-        pid:pid
+  //公布考试结果
+  function publishExam(){
+    if(window.confirm("是否公布考试结果?")){
+      fetch(`/api/publishexam`,{
+        method: 'post', 
+        headers: new Headers({
+          'Authorization': localStorage.getItem("token")!,
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({
+          public:"yes",
+          pid:store.currentPaperId
+        })
+      }).then(v=>{
+        return v.json()
+      }).then(v=>{
+        switch(v.msg){
+          case "success":
+            window.alert("成绩已公布")
+            break
+          case "fail":
+            window.alert("成绩公布失败")
+            break
+          default: window.alert(v)
+        }
+      }).catch(err=>{
+        console.log(err)
       })
-    }).then(v=>{
-      return v.json()
-    }).then(v=>{
-      switch(v.msg){
-        case "success":
-          studentAnswers.length=0
-          studentAnswers.push(...v.data)
-          break
-        case "fail":
-          window.alert(v.msg)
-          break
-        default: window.alert(v)
-      }
-    }).catch(err=>{
-      console.log(err)
-    })
+    }
   }
 </script>
 
 <template>
   <div class="student-nav">
     <template v-for="exam in studentExams">
-      <div @click="getAnswers(exam.sid,exam.pid)" class="item" :class="{selected:exam.sid==currentStudentId}">
+      <div @click="store.getAnswers(exam.sid,exam.pid)" class="item" :class="{selected:exam.sid==store.currentStudentId}">
         {{ exam.name }}
       </div>
     </template>
+    <button v-if="store.currentPaperId!=0" @click="publishExam()">公布考试结果</button>
   </div>
   <div class="review-container">
-    <div v-for="(answer, index) in studentAnswers">
+    <div v-for="(answer, index) in store.studentAnswers">
       <div>
         {{ store.questions[index].description }}
       </div>

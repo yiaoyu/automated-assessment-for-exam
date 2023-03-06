@@ -13,6 +13,7 @@ export interface question{
     description:string
     type:string
     answer:string
+    score:number
 }
 export interface exam{
     sid:number
@@ -23,6 +24,7 @@ export interface exam{
     public?:string
     times?:number
     name?:string
+    title?:string
 }
 export interface answer{
     sid:number

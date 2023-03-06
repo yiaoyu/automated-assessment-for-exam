@@ -18,6 +18,7 @@
           description:store.questions[i].description,
           type:store.questions[i].type,
           answer:store.questions[i].answer,
+          score:store.questions[i].score,
           id:store.questions[i].id
         })
       }).then(v=>{
@@ -77,7 +78,7 @@
         pid:store.currentPaperId,
         description:"",
         type:"select",
-        answer:""
+        answer:"",
       })
     }).then(v=>{
       return v.json()
