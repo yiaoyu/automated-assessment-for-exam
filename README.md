@@ -8,6 +8,15 @@
 
 鼠标悬浮时阴影属性会变化，当切换为注册时容器高度会动态变化
 
+## 主要功能
+
+主要功能已经实现，正在优化UI界面中...
+
+![QQ截图20230319231223](https://user-images.githubusercontent.com/60060657/226185628-048f9de4-41b8-4740-94fd-4594154265f9.png)
+
+
+![QQ截图20230319231140](https://user-images.githubusercontent.com/60060657/226185634-1d5d5806-f9eb-4e17-8eea-dd97c07dd345.png)
+
 
 ## 在Docker上部署Mysql数据库
 
