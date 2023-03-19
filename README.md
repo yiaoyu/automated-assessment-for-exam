@@ -2,6 +2,16 @@
 
 使用Vue3+Express+Mysql为框架搭建的线上答题平台，能够实现用户的登录注册、教师端的编辑试题，查看并批改学生回答、发布考试结果、学生端的练习考试、查看结果等功能。主要部分使用Vue3，Less以及Typescript进行设计、使用CSS3的Transition功能编写登录界面的简易Web动画、使用Pinia进行全局状态管理、使用Vue Router进行路由配置、使用Express作为框架，对数据库进行CRUD操作、使用Docker部署Mysql数据库。
 
+## 登录界面
+
+![QQ截图20230319230428](https://user-images.githubusercontent.com/60060657/226185359-3791ff70-87d6-4b09-95a2-e129ebd847b9.png)
+鼠标悬浮时阴影属性会变化，当切换为注册时容器高度会动态变化
+
+
+## 在Docker上部署Mysql数据库
+
+![QQ截图20230319230230](https://user-images.githubusercontent.com/60060657/226185369-66e22ce1-2cb7-4951-80a5-04c33c215209.png)
+
 
 ## 用例图
 
