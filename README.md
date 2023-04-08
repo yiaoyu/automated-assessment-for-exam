@@ -1,68 +1,36 @@
-# AutomaticApproval
+# 线上答题平台
 
-This template should help get you started developing with Vue 3 in Vite.
+使用Vue3+Express+Mysql为框架搭建的线上答题平台，能够实现用户的登录注册、教师端的编辑试题，查看并批改学生回答、发布考试结果、学生端的练习考试、查看结果等功能。主要部分使用Vue3，Less以及Typescript进行设计、使用CSS3的Transition功能编写登录界面的简易Web动画、使用Pinia进行全局状态管理、使用Vue Router进行路由配置、使用Express作为框架，对数据库进行CRUD操作、使用Docker部署Mysql数据库。
 
-## Recommended IDE Setup
+## 登录界面
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+![QQ截图20230319230428](https://user-images.githubusercontent.com/60060657/226185359-3791ff70-87d6-4b09-95a2-e129ebd847b9.png)
 
-## Type Support for `.vue` Imports in TS
+鼠标悬浮时阴影属性会变化，当切换为注册时容器高度会动态变化
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+## 主要功能
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+主要功能已经实现，正在优化UI界面中...
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+![QQ截图20230319231223](https://user-images.githubusercontent.com/60060657/226185628-048f9de4-41b8-4740-94fd-4594154265f9.png)
 
-## Customize configuration
+学生界面，可以进行在线测试，以及查看测试结果（如图所示的一个功能，如果考试限制次数，不允许重复考试，学生将无法进行第二次考试）
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
 
-## Project Setup
+![QQ截图20230319231140](https://user-images.githubusercontent.com/60060657/226185634-1d5d5806-f9eb-4e17-8eea-dd97c07dd345.png)
 
-```sh
-npm install
-```
+教师界面，可以实现试卷的编辑、查看学生提交的试卷、并对试卷进行批改以及发布成绩
 
-### Compile and Hot-Reload for Development
 
-```sh
-npm run dev
-```
+## 在Docker上部署Mysql数据库
 
-### Type-Check, Compile and Minify for Production
+![QQ截图20230319230230](https://user-images.githubusercontent.com/60060657/226185369-66e22ce1-2cb7-4951-80a5-04c33c215209.png)
 
-```sh
-npm run build
-```
 
-### Run Headed Component Tests with [Cypress Component Testing](https://on.cypress.io/component)
+## 用例图
 
-```sh
-npm run test:unit:dev # or `npm run test:unit` for headless testing
-```
+![QQ截图20230319225905](https://user-images.githubusercontent.com/60060657/226184599-565019b9-eec3-4b02-8c3a-e49b41728f8f.png)
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+## 数据库类图
 
-```sh
-npm run test:e2e:dev
-```
-
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
-npm run build
-npm run test:e2e
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+![QQ截图20230319225918](https://user-images.githubusercontent.com/60060657/226184621-ff45101d-9439-4373-bce6-7c41f5bbb360.png)
