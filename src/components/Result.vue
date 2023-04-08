@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import type { question } from "@/stores/entity";
   import { mainStore } from "../stores/main"
   import { reactive,watch,onBeforeMount } from "vue"
   const store = mainStore()

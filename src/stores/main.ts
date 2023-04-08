@@ -149,6 +149,7 @@ export const mainStore = defineStore("main", () => {
       switch(v.msg){
         case "success":
           questions.push(...v.data)
+          AnswerToOBJ()
           break
         case "fail":
           window.alert(v)
@@ -227,6 +228,28 @@ export const mainStore = defineStore("main", () => {
     console.log("main.ts getQuestionIdByAnswer:找不到对应题目！")
     return 0
   }
+  //修改tab的默认输入
+  function onTab(e: any){
+    let start = e.target.selectionStart
+    e.target.value = e.target.value.substring(0,e.target.selectionStart) + '    ' + e.target.value.substring(e.target.selectionEnd)
+    e.target.selectionStart = e.target.selectionEnd = start+4
+  }
+  //将answerOBJ的内容进行打包为string传入answer内
+  function OBJToAnswer(){
+    for(let i=0;i<questions.length;i++){
+      if(questions[i].answerOBJ !== undefined){
+        questions[i].answer = JSON.stringify(questions[i].answerOBJ)
+      }
+    }
+  }
+  //将answer的内容解压至answerOBJ内
+  function AnswerToOBJ(){
+    for(let i=0;i<questions.length;i++){
+      if(questions[i].answer != ""){
+        questions[i].answerOBJ = JSON.parse(questions[i].answer)
+      }
+    }
+  }
   return { 
     currentNav,
     currentItem,
@@ -256,5 +279,8 @@ export const mainStore = defineStore("main", () => {
     getCurrentAnswer,
     getDateTime,
     getQuestionIdByAnswer,
+    onTab,
+    OBJToAnswer,
+    AnswerToOBJ,
    }
 });
