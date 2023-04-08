@@ -16,6 +16,7 @@ export interface question{
     answer:string
     score:number
     answerOBJ?:any
+    currentAnswerType?:string
 }
 export interface exam{
     sid:number
@@ -66,9 +67,9 @@ export class Choice{
 export class Blank{
     public trueAnswers
     public scores
-    public constructor(trueAnswers:string[][],score:number[]){
+    public constructor(trueAnswers:string[][],scores:number[]){
         this.trueAnswers = trueAnswers
-        this.scores = score
+        this.scores = scores
     }
 }
 export class Code{

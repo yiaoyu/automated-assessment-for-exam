@@ -11,17 +11,20 @@
   function addAnswerOBJ(index:number,type:string){
     switch(type){
       case 'choice':
-        store.questions[index].answerOBJ = new entity.Choice('radio',['A.','B.','C.','D.'],[true,false,false,false],0);
+        store.questions[index].answerOBJ = new entity.Choice('',['A.','B.','C.','D.'],[true,false,false,false],0);
+        store.questions[index].currentAnswerType = 'choice'
         break;
       case 'blank':
         store.questions[index].answerOBJ = new entity.Blank([[""]],[0]);
+        store.questions[index].currentAnswerType = 'blank'
         break;
       case 'code':
         store.questions[index].answerOBJ = new entity.Code(["text"],[""],[""],[0])
+        store.questions[index].currentAnswerType = 'code'
         break;
     }
   }
-  //增加和减少选项
+  //选择题增加和减少选项
   function addChoice(i:number){
     store.questions[i].answerOBJ.choices.push("")
     store.questions[i].answerOBJ.trueAnswers.push(false)
@@ -30,7 +33,30 @@
     store.questions[i].answerOBJ.choices.pop()
     store.questions[i].answerOBJ.trueAnswers.pop()
   }
-  //增加和减少填空
+  //选择题自动配置选项类型
+  function changeChoiceModel(index:number){
+    let count = 0
+    for(let i=0;i<store.questions[index].answerOBJ.trueAnswers.length;i++){
+      if(store.questions[index].answerOBJ.trueAnswers[i]){
+        count++
+      }
+    }
+    if(count<=1){
+      store.questions[index].answerOBJ.model = 'radio';
+    }else if(store.questions[index].answerOBJ.scorePart!=0){
+      store.questions[index].answerOBJ.model = 'mulitiPart'
+    }else{
+      store.questions[index].answerOBJ.model = 'multiAll'
+    }
+  }
+  //选择题检测选不全分数不超高总分
+  function choiceScoreLimit(index:number){
+    if(store.questions[index].score < store.questions[index].answerOBJ.scorePart){
+      window.alert("选不全得分不能超过总分数！")
+      store.questions[index].answerOBJ.scorePart = store.questions[index].score
+    }
+  }
+  //填空题增加和减少填空
   function addBlank(i:number){
     store.questions[i].answerOBJ.trueAnswers.push([""])
     store.questions[i].answerOBJ.scores.push(0)
@@ -39,14 +65,14 @@
     store.questions[i].answerOBJ.trueAnswers.pop()
     store.questions[i].answerOBJ.scores.pop()
   }
-  //增加和减少填空中可供匹配的答案数量
+  //填空题增加和减少填空中可供匹配的答案数量
   function addBlankAnswer(i:number,j:number){
     store.questions[i].answerOBJ.trueAnswers[j].push("")
   }
   function removeBlankAnswer(i:number,j:number){
     store.questions[i].answerOBJ.trueAnswers[j].pop()
   }
-  //增加和减少代码检测块
+  //编程题增加和减少代码检测块
   function addCodeCheck(i:number){
     store.questions[i].answerOBJ.modules.push("text")
     store.questions[i].answerOBJ.scores.push(0)
@@ -58,6 +84,13 @@
     store.questions[i].answerOBJ.scores.pop()
     store.questions[i].answerOBJ.trueAnswers.pop()
     store.questions[i].answerOBJ.comments.pop()
+  }
+  //计算总分
+  function countScore(index:number){
+    store.questions[index].score = 0
+    for(let i=0;i<store.questions[index].answerOBJ.scores.length;i++){
+      store.questions[index].score+=store.questions[index].answerOBJ.scores[i]
+    }
   }
   //保存修改 *需要添加事务*
   async function saveAllQuestion(){
@@ -215,6 +248,13 @@
       })
     }
   }
+  //发布试卷
+  function publish(){
+    //mysql数据返回的数据需要加8小时，东八区还要再加8小时
+    let date = new Date(+new Date() + 16 * 3600 * 1000)
+    store.papers[store.getPaperPage(store.currentPaperId)].releaseTime=date.toISOString().slice(0,19).replace('T',' ')
+    changePaper()
+  }
 </script>
 
 <template>
@@ -265,7 +305,7 @@
         </div>
         <div>
           <div>该题分数</div>
-          <input type="number" v-model="question.score">
+          <div>{{ question.score }}</div>
         </div>
         <div>
           <div>题目类型</div>
@@ -279,24 +319,30 @@
           <div>题干：</div>
           <textarea v-model="question.description" @keydown.tab.prevent="store.onTab"></textarea>
         </div>
-        <div class="choice-container" v-if="question.type=='choice'&&store.questions[index].answerOBJ !== undefined">
+        <!-- 选择题 -->
+        <div class="choice-container" v-if="question.currentAnswerType=='choice'">
           <div>选择题</div>
+          <div>
+            <span>题目总分数</span>
+            <input min="0" type="number" v-model="store.questions[index].score">
+          </div>
+          <div>
+            <span>选不全得分:</span>
+            <input type="number" v-model="store.questions[index].answerOBJ.scorePart" @change="choiceScoreLimit(index)">
+          </div>
           <div v-for="_,i in store.questions[index].answerOBJ.choices">
             <input type="text" v-model="store.questions[index].answerOBJ.choices[i]">
-            <input type="checkbox" v-model="store.questions[index].answerOBJ.trueAnswers[i]">
+            <input type="checkbox" v-model="store.questions[index].answerOBJ.trueAnswers[i]" @change="changeChoiceModel(index)">
           </div>
           <button @click="addChoice(index)">增加选项</button>
           <button @click="removeChoice(index)">减少选项</button>
-          <div>
-            <span>选不全得分:</span>
-            <input type="number" v-model="store.questions[index].answerOBJ.scorePart">
-          </div>
         </div>
-        <div class="blank-container" v-if="question.type=='blank'&&store.questions[index].answerOBJ !== undefined">
+        <!-- 填空题 -->
+        <div class="blank-container" v-if="question.currentAnswerType=='blank'">
           <div>填空题</div>
           <div v-for="_,i in store.questions[index].answerOBJ.trueAnswers">
             <span>分数：</span>
-            <input class="blank-score" type="number" v-model="store.questions[index].answerOBJ.scores[i]">
+            <input min="0" class="blank-score" type="number" v-model="store.questions[index].answerOBJ.scores[i]" @change="countScore(index)">
             <span>正确答案：</span>
             <div v-for="_,j in store.questions[index].answerOBJ.trueAnswers[i]" class="blank-input-container">
               <input class="blank-input" type="text" v-model="store.questions[index].answerOBJ.trueAnswers[i][j]">
@@ -307,7 +353,8 @@
           <button class="blank-btn" @click="addBlank(index)">增加选项</button>
           <button class="blank-btn" @click="removeBlank(index)">减少选项</button>
         </div>
-        <div class="code-container" v-if="question.type=='code'&&store.questions[index].answerOBJ !== undefined">
+        <!-- 编程题 -->
+        <div class="code-container" v-if="question.currentAnswerType=='code'">
           <div>编程题</div>
           <div v-for="_,i in store.questions[index].answerOBJ.trueAnswers">
             <span>类型选择：</span>
@@ -317,7 +364,7 @@
               <option value="ast">抽象语法树</option>
             </select>
             <span>分数：</span>
-            <input class="blank-score" type="number" v-model="store.questions[index].answerOBJ.scores[i]">
+            <input min="0" class="blank-score" type="number" v-model="store.questions[index].answerOBJ.scores[i]" @change="countScore(index)">
             <span>错误提示：</span>
             <input type="text" v-model="store.questions[index].answerOBJ.comments[i]">
             <div>输入检测内容：</div>
@@ -331,6 +378,7 @@
     </div>
     <button @click="addQuestion">增加题目</button>
     <button @click="saveAllQuestion">保存修改</button>
+    <button @click="publish">发布试卷</button>
   </div>
 </template>
 
