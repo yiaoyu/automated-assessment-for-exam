@@ -9,7 +9,6 @@
       store.getAllquestion(pid)
     }
   });
-  //增加标准答案对象
   function addAnswerOBJ(index:number,type:string){
     switch(type){
       case 'choice':
@@ -21,7 +20,7 @@
         store.questions[index].currentAnswerType = 'blank'
         break;
       case 'code':
-        store.questions[index].answerOBJ = new entity.Code(["text"],[""],[""],[0])
+        store.questions[index].answerOBJ = new entity.Code(["text"],[""],[""],[0],"")
         store.questions[index].currentAnswerType = 'code'
         break;
     }
@@ -307,7 +306,10 @@
     </div>
     <button @click="removePaper">删除试卷</button>
     <button @click="changePaper">保存试卷信息</button>
-    <div class="question-container" >
+    <!-- 当前试卷未发布 -->
+    <!-- 第一次发布之后无法改变题目数量 -->
+    <!-- 第一次发布之后无法改变题目类型 -->
+    <div class="question-container">
       <div v-for="question,index in store.questions">
         <div>
           <div>题号</div>
@@ -323,7 +325,8 @@
         </div>
         <div>
           <div>题目类型</div>
-          <select v-model="question.type" @change="addAnswerOBJ(index,question.type)">
+          <div v-if="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime!==null">{{ question.type }}</div>
+          <select v-model="question.type" @change="addAnswerOBJ(index,question.type)" v-if="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime===null">
             <option value="choice">选择题</option>
             <option value="blank">填空题</option>
             <option value="code">编程题</option>
@@ -370,6 +373,10 @@
         <!-- 编程题 -->
         <div class="code-container" v-if="question.currentAnswerType=='code'">
           <div>编程题</div>
+          <div>
+            <div>回答框架</div>
+            <textarea v-model="store.questions[index].answerOBJ.frame" @keydown.tab.prevent="store.onTab"></textarea>
+          </div>
           <div v-for="_,i in store.questions[index].answerOBJ.trueAnswers">
             <span>类型选择：</span>
             <select v-model="store.questions[index].answerOBJ.modules[i]">
@@ -387,11 +394,11 @@
           <button class="blank-btn" @click="addCodeCheck(index)">增加检测</button>
           <button class="blank-btn" @click="removeCodeCheck(index)">减少检测</button>
         </div>
-        <button @click="removeQuestion(question.id)">删除题目</button>
+        <button @click="removeQuestion(question.id)" v-if="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime===null">删除该题目</button>
       </div>
+      <button @click="addQuestion" v-if="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime===null">增加题目</button>
+      <button @click="saveAllQuestion">保存修改</button>
     </div>
-    <button @click="addQuestion">增加题目</button>
-    <button @click="saveAllQuestion">保存修改</button>
     <button @click="publish" v-if="store.papers[store.getPaperPage(store.currentPaperId)].closed==='true'||store.papers[store.getPaperPage(store.currentPaperId)].releaseTime === null">发布试卷</button>
     <button @click="suppress" v-if="store.papers[store.getPaperPage(store.currentPaperId)].closed==='false'">结束考试</button>
   </div>
@@ -414,5 +421,9 @@
   .blank-answer-btn{
     display: inline;
     width: 1rem;
+  }
+  textarea{
+    width: 20rem;
+    height: 10rem;
   }
 </style>

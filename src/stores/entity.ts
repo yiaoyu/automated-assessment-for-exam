@@ -38,6 +38,7 @@ export interface answer{
     answer?:string
     score?:number
     comment?:string
+    answerOBJ?:any
 }
 export interface student{
     id:number
@@ -79,11 +80,13 @@ export class Code{
     public trueAnswers
     public comments
     public scores
-    public constructor(modules:string[],trueAnswers:string[],comments:string[],scores:number[]){
+    public frame
+    public constructor(modules:string[],trueAnswers:string[],comments:string[],scores:number[],frame:string){
         this.modules = modules
         this.trueAnswers = trueAnswers
         this.comments = comments
         this.scores = scores
+        this.frame = frame
     }
     // models:string[]//每个匹配的模式:text/reg/ast
     // trueAnswers:string[]//执行多个匹配

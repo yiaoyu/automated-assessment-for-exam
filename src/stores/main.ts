@@ -235,7 +235,7 @@ export const mainStore = defineStore("main", () => {
     e.target.value = e.target.value.substring(0,e.target.selectionStart) + '    ' + e.target.value.substring(e.target.selectionEnd)
     e.target.selectionStart = e.target.selectionEnd = start+4
   }
-  //将answerOBJ的内容进行打包为string传入answer内
+  //将（标准答案对象）的内容进行打包为string传入answer内
   function OBJToAnswer(){
     for(let i=0;i<questions.length;i++){
       if(questions[i].answerOBJ !== undefined){
@@ -243,11 +243,28 @@ export const mainStore = defineStore("main", () => {
       }
     }
   }
-  //将answer的内容解压至answerOBJ内
+  //将answer的内容解压至（标准答案对象）
   function AnswerToOBJ(){
     for(let i=0;i<questions.length;i++){
       if(questions[i].answer != ""){
         questions[i].answerOBJ = JSON.parse(questions[i].answer)
+        questions[i].currentAnswerType = questions[i].type
+      }
+    }
+  }
+  //将（学生回答对象）转化为string类型
+  function OBJToString(){
+    for(let i=0;i<currentAnswers.length;i++){
+      if(currentAnswers[i].answerOBJ !== undefined){
+        currentAnswers[i].answer = JSON.stringify(currentAnswers[i].answerOBJ)
+      }
+    }
+  }
+  //将string的内容解压至（学生回答对象）内
+  function StringToOBJ(){
+    for(let i=0;i<currentAnswers.length;i++){
+      if(currentAnswers[i].answer != ""){
+        currentAnswers[i].answerOBJ = JSON.parse(currentAnswers[i].answer!)
       }
     }
   }
@@ -283,5 +300,7 @@ export const mainStore = defineStore("main", () => {
     onTab,
     OBJToAnswer,
     AnswerToOBJ,
+    OBJToString,
+    StringToOBJ,
    }
 });

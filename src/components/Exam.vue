@@ -10,7 +10,22 @@
   watch(() => store.currentPaperId, (pid) => {
     store.getAllquestion(pid)
   });
-
+  //展示题目的要求，分数，类型，以及序号
+  function questionHead(index:number){
+    let type = ""
+    switch(store.questions[index].type){
+      case 'choice':
+        if(store.questions[index].answerOBJ.model=='radio'){
+          type='(单选题) '
+        }else{
+          type='(多选题) '
+        }
+        break;
+      case 'blank':type='(填空题) ';break;
+      case 'code':type='(编程题) ';break;
+    }
+    return (index+1)+'.'+type+store.questions[index].description+' ('+store.questions[index].score+'分)'
+  }
   //获取本地保存内容
   function getlocalExam(){
     if(store.currentAnswers.length==0){
@@ -18,6 +33,7 @@
         store.currentExam = JSON.parse(localStorage.getItem('currentExam')!)
         store.currentAnswers.push(...JSON.parse(localStorage.getItem('currentAnswers')!))
         store.currentPaperId = store.currentExam.pid
+        store.StringToOBJ()
         store.hasCreatedAnswer=true
       }
     }
@@ -25,6 +41,7 @@
 
   //保存内容到本地
   function saveExam(){
+    store.OBJToString()
     localStorage.setItem('currentExam',JSON.stringify(store.currentExam))
     localStorage.setItem('currentAnswers',JSON.stringify(store.currentAnswers))
     window.alert("试卷已保存！")
@@ -47,7 +64,8 @@
           qid:store.questions[i].id,
           answer:"",
           score:0,
-          comment:""
+          comment:"",
+          answerOBJ:createAnswerOBJ(i)
         }
         store.currentAnswers.push(answer)
       }
@@ -55,7 +73,26 @@
       store.hasCreatedAnswer=true
     }
   }
-
+  //根据题目类型创建每个题目的回答框架
+  function createAnswerOBJ(index:number){
+    switch(store.questions[index].type){
+      case 'choice':
+        let choices = []
+        for(let i=0;i<store.questions[index].answerOBJ.trueAnswers.length;i++){
+          choices.push(false)
+        }
+        return choices
+      case 'blank':
+        let blanks = []
+        for(let i=0;i<store.questions[index].answerOBJ.trueAnswers.length;i++){
+          blanks.push("")
+        }
+        return blanks
+      case 'code':
+        let code:string = store.questions[index].answerOBJ.frame
+        return code
+    }
+  }
   //检测剩余次数
   async function checkTimes(paperId:number){
     console.log("checkTimes()")
@@ -215,6 +252,7 @@
   //提交考试
   async function submitExam(){
     console.log("submitExam()")
+    store.OBJToString()
     // 添加结束时间
     store.currentExam.finishTime = store.getDateTime()
     // 上传考试信息
@@ -305,11 +343,11 @@
 </script>
 
 <template>
-  <div class="edit-paper-container">
+  <div class="edit-paper-container" v-if="store.currentPaperId!=-1">
     <div class="header" v-if="store.currentPaperId!=0">
       <h1 class="header-title">{{ store.papers[store.getPaperPage(store.currentPaperId)].title }}</h1>
       <h3 class="header-time-limit">考试时长：{{ store.papers[store.getPaperPage(store.currentPaperId)].timeLimit }}</h3>
-      <div class="header-info">考试须知 请给数据库添加description字段!</div>
+      <div class="header-info">{{ store.papers[store.getPaperPage(store.currentPaperId)].description }}</div>
       <button @click="startExam(store.currentPaperId)" 
       :disabled="store.currentExam.pid!=0">
       开始作答
@@ -317,12 +355,29 @@
     </div>
     <div class="exam" v-if="store.papers[store.getPaperPage(store.currentPaperId)].id==store.currentExam.pid&&store.hasCreatedAnswer">
       <div class="paper">
-        <template v-for="question in store.questions" :key="question.id">
+        <template v-for="question,index in store.questions" :key="question.id">
           <div class="question">
-            <div class="description">
-              {{ question.description }}
+            <div class="question-head">
+              <span>{{ questionHead(index) }}</span>
             </div>
-            <input type="text" v-model="store.currentAnswers[store.getCurrentAnswer(question.id)].answer" class="answer">
+            <!-- 选择题 -->
+            <div class="answer-container" v-if="question.currentAnswerType=='choice'">
+              <div v-for="_,i in store.questions[index].answerOBJ.choices">
+                <span>{{ store.questions[index].answerOBJ.choices[i] }}</span>
+                <input type="checkbox" v-model="store.currentAnswers[index].answerOBJ[i]">
+              </div>
+            </div>
+            <!-- 填空题 -->
+            <div class="answer-container" v-if="question.currentAnswerType=='blank'">
+              <div v-for="_,i in store.currentAnswers[index].answerOBJ">
+                <span>{{ '('+(i+1)+')' }}</span>
+                <input class="blank-input" type="text" v-model="store.currentAnswers[index].answerOBJ[i]">
+              </div>
+            </div>
+            <!-- 编程题 -->
+            <div class="answer-container" v-if="question.currentAnswerType=='code'">
+              <textarea class="code-input" v-model="store.currentAnswers[index].answerOBJ"></textarea>
+            </div>
             <hr/>
           </div>
         </template>
@@ -347,11 +402,14 @@
       .paper{
         .question{
           padding: 1rem;
-          .description{
-            padding-bottom: 1rem;
-          }
-          .answer{
-            background-color: #ffffff;
+          .answer-container{
+            .blank-input{
+              background-color: azure;
+            }
+            .code-input{
+              width: 20rem;
+              height: 12rem;
+            }
           }
         }
       }
