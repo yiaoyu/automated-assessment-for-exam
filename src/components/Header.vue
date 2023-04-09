@@ -6,7 +6,7 @@
   }>();
   const store = mainStore()
   watch(()=>store.currentNav,(nav)=>{
-    store.currentPaperId=0
+    store.currentPaperId=-1
     store.currentItem=0
   })
   function changeNav(name:string){

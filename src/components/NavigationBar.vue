@@ -86,7 +86,7 @@
       <div class="items" v-for="paper in store.papers"
       :key="paper.id"
       @click="store.currentPaperId=paper.id">
-        <div v-if="paper.type=='exercise'&&paper.releaseTime !== null" class="item" :class="{selected:store.currentPaperId==paper.id}">
+        <div v-if="paper.type=='exercise'&&paper.closed !== 'true'" class="item" :class="{selected:store.currentPaperId==paper.id}">
           {{paper.title}}
         </div>
       </div>
@@ -97,7 +97,7 @@
       :key="paper.id"
       @click="store.currentPaperId=paper.id"
       :class="{selected:store.currentPaperId==paper.id}">
-        <div v-if="paper.type=='exam'&&paper.releaseTime !== null" class="item" :class="{selected:store.currentPaperId==paper.id}">
+        <div v-if="paper.type=='exam'&&paper.closed !== 'true'" class="item" :class="{selected:store.currentPaperId==paper.id}">
           {{paper.title}}
         </div>
       </div>

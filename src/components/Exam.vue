@@ -3,7 +3,7 @@
   import { reactive,watch,onBeforeMount,ref } from "vue"
   import type * as entity from "../stores/entity"
   const store = mainStore()
-  const exceedTimes = ref(false)
+  const exceedTimes = ref(false)//答题是否超过次数
   onBeforeMount(() => {
     getlocalExam()
   })
@@ -75,19 +75,34 @@
     }).then(async v=>{//箭头函数使用async/await
       switch(v.msg){
         case "success":
+          if(store.papers[store.getPaperPage(paperId)].maxTimes! == 0){
+            //无次数限制
+            store.currentExam.times = v.data[0].times + 1
+            await deleteLastExam(store.userId,paperId)
+            exceedTimes.value = false
+            return
+          }
+          if(store.papers[store.getPaperPage(paperId)].type == 'exercise'){
+            //练习模式
+            store.currentExam.times = v.data[0].times + 1
+            await deleteLastExam(store.userId,paperId)
+            exceedTimes.value = false
+            return
+          }
           if(v.data.length==0){
             //初次做题
             store.currentExam.times = 1
             exceedTimes.value = false
             return
-          }else if(v.data[0].times < store.papers[store.getPaperPage(paperId)].maxTimes!){
-            //重做试题
+          }
+          if(v.data[0].times < store.papers[store.getPaperPage(paperId)].maxTimes!){
+            //次数不超过上限
             store.currentExam.times = v.data[0].times + 1
             await deleteLastExam(store.userId,paperId)
             exceedTimes.value = false
             return
           }else{
-            //超过上限
+            //次数超过上限
             exceedTimes.value = true
             return
           }
@@ -284,7 +299,7 @@
       public:"yes",
       times:0
     }
-    store.currentPaperId = 0
+    store.currentPaperId = -1
     store.hasCreatedAnswer = false
   }
 </script>

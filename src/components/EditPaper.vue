@@ -5,7 +5,9 @@
   const store = mainStore()
   //切换试卷时修改题目
   watch(() => store.currentPaperId, (pid) => {
-    store.getAllquestion(pid)
+    if(store.currentPaperId != -1){
+      store.getAllquestion(pid)
+    }
   });
   //增加标准答案对象
   function addAnswerOBJ(index:number,type:string){
@@ -229,6 +231,8 @@
           timeLimit:store.papers[store.getPaperPage(store.currentPaperId)].timeLimit,
           type:store.papers[store.getPaperPage(store.currentPaperId)].type,
           maxTimes:store.papers[store.getPaperPage(store.currentPaperId)].maxTimes,
+          description:store.papers[store.getPaperPage(store.currentPaperId)].description,
+          closed:store.papers[store.getPaperPage(store.currentPaperId)].closed,
           id:store.currentPaperId
         })
       }).then(v=>{
@@ -250,15 +254,21 @@
   }
   //发布试卷
   function publish(){
-    //mysql数据返回的数据需要加8小时，东八区还要再加8小时
-    let date = new Date(+new Date() + 16 * 3600 * 1000)
+    store.papers[store.getPaperPage(store.currentPaperId)].closed='false'
+    //mysql东八区要再加8小时
+    let date = new Date(+new Date() + 8 * 3600 * 1000)
     store.papers[store.getPaperPage(store.currentPaperId)].releaseTime=date.toISOString().slice(0,19).replace('T',' ')
+    changePaper()
+  }
+  //结束考试
+  function suppress(){
+    store.papers[store.getPaperPage(store.currentPaperId)].closed='true'
     changePaper()
   }
 </script>
 
 <template>
-  <div class="edit-paper-container">
+  <div class="edit-paper-container" v-if="store.currentPaperId!=-1">
     <h1>edit-paper</h1>
     <div class="paper-setting">
       <div>试卷编号：</div>
@@ -274,15 +284,19 @@
     </div>
     <div class="paper-setting">
       <div>发布时间</div>
-      <input type="text" v-model="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime">
+      <div>{{ store.papers[store.getPaperPage(store.currentPaperId)].releaseTime }}</div>
     </div>
     <div class="paper-setting">
       <div>时间限制</div>
-      <input type="text" v-model="store.papers[store.getPaperPage(store.currentPaperId)].timeLimit">
+      <input type="number" v-model="store.papers[store.getPaperPage(store.currentPaperId)].timeLimit">
     </div>
     <div class="paper-setting">
       <div>次数限制</div>
-      <input type="text" v-model="store.papers[store.getPaperPage(store.currentPaperId)].maxTimes">
+      <input type="number" min="0" v-model="store.papers[store.getPaperPage(store.currentPaperId)].maxTimes">
+    </div>
+    <div class="paper-setting">
+      <div>试卷头</div>
+      <textarea v-model="store.papers[store.getPaperPage(store.currentPaperId)].description"></textarea>
     </div>
     <div class="paper-setting">
       <div>试卷类型</div>
@@ -378,7 +392,8 @@
     </div>
     <button @click="addQuestion">增加题目</button>
     <button @click="saveAllQuestion">保存修改</button>
-    <button @click="publish">发布试卷</button>
+    <button @click="publish" v-if="store.papers[store.getPaperPage(store.currentPaperId)].closed==='true'||store.papers[store.getPaperPage(store.currentPaperId)].releaseTime === null">发布试卷</button>
+    <button @click="suppress" v-if="store.papers[store.getPaperPage(store.currentPaperId)].closed==='false'">结束考试</button>
   </div>
 </template>
 

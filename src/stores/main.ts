@@ -5,8 +5,8 @@ export const mainStore = defineStore("main", () => {
   //flag
   const currentNav = ref("")//当前导航栏
   const currentItem = ref(0)//当前的设置选项（只在setting中使用）
-  const currentPaperId = ref(0)//当前选择的试卷号
-  const currentStudentId = ref(0)//当前学生的id
+  const currentPaperId = ref(-1)//当前选择的试卷号
+  const currentStudentId = ref(-1)//当前学生的id
   //用户基本信息
   const userName=ref("")
   const userId=ref(0)
@@ -107,6 +107,7 @@ export const mainStore = defineStore("main", () => {
   function getAllPaper(){
     //获取所有的试卷
     papers.length = 0//清空数组
+    currentPaperId.value = -1
     fetch(`/api/getallpaper`,{
       method: 'post', 
       headers: new Headers({

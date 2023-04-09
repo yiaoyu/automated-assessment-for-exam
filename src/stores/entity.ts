@@ -7,6 +7,8 @@ export interface paper{
     timeLimit?:number
     type?:string
     maxTimes?:number
+    description?:string
+    closed?:string
 }
 export interface question{
     id:number
