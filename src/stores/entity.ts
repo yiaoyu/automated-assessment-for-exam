@@ -1,4 +1,4 @@
-// 数据库数据接口
+// 基础数据接口
 export interface paper{
     id:number
     tid:number
@@ -55,7 +55,7 @@ export interface teacher{
     pwd:string
 }
 // 标准答案类型
-export class Choice{
+export class Choice{//选择题
     public model//radio,multiAll,mulitiPart
     public choices//选项
     public trueAnswers//正确答案
@@ -67,29 +67,28 @@ export class Choice{
         this.scorePart = scorePart
     }
 }
-export class Blank{
-    public trueAnswers
-    public scores
+export class Blank{//填空题
+    public trueAnswers//填空题的正确答案（每个空有多个匹配方式）
+    public scores//每个空的分数
     public constructor(trueAnswers:string[][],scores:number[]){
         this.trueAnswers = trueAnswers
         this.scores = scores
     }
 }
-export class Code{
-    public modules
-    public trueAnswers
-    public comments
-    public scores
-    public frame
-    public constructor(modules:string[],trueAnswers:string[],comments:string[],scores:number[],frame:string){
+export class Code{//编程题
+    //一个题目有多个检测
+    public modules//每个检测的类型text/reg/ast
+    public checks//每个检测需要执行的用例（ast不需要）
+    public trueAnswers//每个检测结果的匹配
+    public comments//错误信息
+    public scores//通过每个检测获得的分数
+    public frame//回答的框架function xxx(){};
+    public constructor(modules:string[],checks:string[],trueAnswers:string[],comments:string[],scores:number[],frame:string){
         this.modules = modules
+        this.checks = checks
         this.trueAnswers = trueAnswers
         this.comments = comments
         this.scores = scores
         this.frame = frame
     }
-    // models:string[]//每个匹配的模式:text/reg/ast
-    // trueAnswers:string[]//执行多个匹配
-    // comments:string[]//如果某个匹配错误给出提示
-    // scores:number[]//完成每个匹配给予的分数
 }

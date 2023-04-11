@@ -12,7 +12,7 @@
   function addAnswerOBJ(index:number,type:string){
     switch(type){
       case 'choice':
-        store.questions[index].answerOBJ = new entity.Choice('',['A.','B.','C.','D.'],[true,false,false,false],0);
+        store.questions[index].answerOBJ = new entity.Choice('',['A.','B.','C.','D.'],[false,false,false,false],0);
         store.questions[index].currentAnswerType = 'choice'
         break;
       case 'blank':
@@ -20,7 +20,7 @@
         store.questions[index].currentAnswerType = 'blank'
         break;
       case 'code':
-        store.questions[index].answerOBJ = new entity.Code(["text"],[""],[""],[0],"")
+        store.questions[index].answerOBJ = new entity.Code(["text"],[""],[""],[""],[0],"")
         store.questions[index].currentAnswerType = 'code'
         break;
     }
@@ -76,15 +76,17 @@
   //编程题增加和减少代码检测块
   function addCodeCheck(i:number){
     store.questions[i].answerOBJ.modules.push("text")
-    store.questions[i].answerOBJ.scores.push(0)
+    store.questions[i].answerOBJ.checks.push("")
     store.questions[i].answerOBJ.trueAnswers.push("")
     store.questions[i].answerOBJ.comments.push("")
+    store.questions[i].answerOBJ.scores.push(0)
   }
   function removeCodeCheck(i:number){
     store.questions[i].answerOBJ.modules.pop()
-    store.questions[i].answerOBJ.scores.pop()
+    store.questions[i].answerOBJ.checks.pop()
     store.questions[i].answerOBJ.trueAnswers.pop()
     store.questions[i].answerOBJ.comments.pop()
+    store.questions[i].answerOBJ.scores.pop()
   }
   //计算总分
   function countScore(index:number){
@@ -167,7 +169,7 @@
         //pid,description,type,answer
         pid:store.currentPaperId,
         description:"",
-        type:"choice",
+        type:"",
         answer:"",
       })
     }).then(v=>{
@@ -338,7 +340,6 @@
         </div>
         <!-- 选择题 -->
         <div class="choice-container" v-if="question.currentAnswerType=='choice'">
-          <div>选择题</div>
           <div>
             <span>题目总分数</span>
             <input min="0" type="number" v-model="store.questions[index].score">
@@ -356,7 +357,6 @@
         </div>
         <!-- 填空题 -->
         <div class="blank-container" v-if="question.currentAnswerType=='blank'">
-          <div>填空题</div>
           <div v-for="_,i in store.questions[index].answerOBJ.trueAnswers">
             <span>分数：</span>
             <input min="0" class="blank-score" type="number" v-model="store.questions[index].answerOBJ.scores[i]" @change="countScore(index)">
@@ -372,7 +372,6 @@
         </div>
         <!-- 编程题 -->
         <div class="code-container" v-if="question.currentAnswerType=='code'">
-          <div>编程题</div>
           <div>
             <div>回答框架</div>
             <textarea v-model="store.questions[index].answerOBJ.frame" @keydown.tab.prevent="store.onTab"></textarea>
@@ -388,8 +387,16 @@
             <input min="0" class="blank-score" type="number" v-model="store.questions[index].answerOBJ.scores[i]" @change="countScore(index)">
             <span>错误提示：</span>
             <input type="text" v-model="store.questions[index].answerOBJ.comments[i]">
-            <div>输入检测内容：</div>
-            <textarea v-model="store.questions[index].answerOBJ.trueAnswers[i]" @keydown.tab.prevent="store.onTab"></textarea>
+            <div class="code-input-container">
+              <div>
+                <div>输入测试用例</div>
+                <textarea v-model="store.questions[index].answerOBJ.checks[i]" @keydown.tab.prevent="store.onTab"></textarea>
+              </div>
+              <div>
+                <div>输入结果检测：</div>
+                <textarea v-model="store.questions[index].answerOBJ.trueAnswers[i]" @keydown.tab.prevent="store.onTab"></textarea>
+              </div>
+            </div>
           </div>
           <button class="blank-btn" @click="addCodeCheck(index)">增加检测</button>
           <button class="blank-btn" @click="removeCodeCheck(index)">减少检测</button>
@@ -425,5 +432,9 @@
   textarea{
     width: 20rem;
     height: 10rem;
+  }
+  .code-input-container{
+    display: flex;
+
   }
 </style>

@@ -181,6 +181,7 @@ export const mainStore = defineStore("main", () => {
         case "success":
           studentAnswers.length=0
           studentAnswers.push(...v.data)
+          ResultToOBJ()
           break
         case "fail":
           window.alert(v.msg)
@@ -268,6 +269,30 @@ export const mainStore = defineStore("main", () => {
       }
     }
   }
+  //将结果转换为OBJ
+  function ResultToOBJ(){
+    for(let i=0;i<studentAnswers.length;i++){
+      if(studentAnswers[i].answer != ""){
+        studentAnswers[i].answerOBJ = JSON.parse(studentAnswers[i].answer!)
+      }
+    }
+  }
+  //展示题目的要求，分数，类型，以及序号
+  function questionHead(index:number){
+    let type = ""
+    switch(questions[index].type){
+      case 'choice':
+        if(questions[index].answerOBJ.model=='radio'){
+          type='(单选题) '
+        }else{
+          type='(多选题) '
+        }
+        break;
+      case 'blank':type='(填空题) ';break;
+      case 'code':type='(编程题) ';break;
+    }
+    return (index+1)+'.'+type+questions[index].description+' ('+questions[index].score+'分)'
+  }
   return { 
     currentNav,
     currentItem,
@@ -302,5 +327,7 @@ export const mainStore = defineStore("main", () => {
     AnswerToOBJ,
     OBJToString,
     StringToOBJ,
+    ResultToOBJ,
+    questionHead,
    }
 });

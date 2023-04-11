@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { mainStore } from "../stores/main"
   import { reactive,watch,onBeforeMount,ref } from "vue"
+  import { tsquery } from '@phenomnomnominal/tsquery';
   import type * as entity from "../stores/entity"
   const store = mainStore()
   const exceedTimes = ref(false)//答题是否超过次数
@@ -10,22 +11,7 @@
   watch(() => store.currentPaperId, (pid) => {
     store.getAllquestion(pid)
   });
-  //展示题目的要求，分数，类型，以及序号
-  function questionHead(index:number){
-    let type = ""
-    switch(store.questions[index].type){
-      case 'choice':
-        if(store.questions[index].answerOBJ.model=='radio'){
-          type='(单选题) '
-        }else{
-          type='(多选题) '
-        }
-        break;
-      case 'blank':type='(填空题) ';break;
-      case 'code':type='(编程题) ';break;
-    }
-    return (index+1)+'.'+type+store.questions[index].description+' ('+store.questions[index].score+'分)'
-  }
+
   //获取本地保存内容
   function getlocalExam(){
     if(store.currentAnswers.length==0){
@@ -75,22 +61,27 @@
   }
   //根据题目类型创建每个题目的回答框架
   function createAnswerOBJ(index:number){
+    let choices = []
+    let blanks = []
+    let scores = []
     switch(store.questions[index].type){
       case 'choice':
-        let choices = []
         for(let i=0;i<store.questions[index].answerOBJ.trueAnswers.length;i++){
           choices.push(false)
         }
         return choices
       case 'blank':
-        let blanks = []
         for(let i=0;i<store.questions[index].answerOBJ.trueAnswers.length;i++){
           blanks.push("")
+          scores.push(0)
         }
-        return blanks
+        return {blanks, scores}
       case 'code':
         let code:string = store.questions[index].answerOBJ.frame
-        return code
+        for(let i=0;i<store.questions[index].answerOBJ.trueAnswers.length;i++){
+          scores.push(0)
+        }
+        return {code, scores}
     }
   }
   //检测剩余次数
@@ -248,11 +239,122 @@
       console.log(err)
     })
   }
-
+  //自动评测
+  function checkAnswer(){
+    for(let i=0;i<store.currentAnswers.length;i++){
+      switch(store.questions[i].type){
+        case 'choice':
+          checkChoice(i)
+        break;
+        case 'blank':
+          checkBlank(i)
+        break;
+        case 'code':
+          checkCode(i)
+        break;
+      }
+    }
+  }
+  //选择题检测
+  function checkChoice(i:number){
+    let miss = false//是否漏选
+    let incorrect = false//是否错选
+    //检测是否错选漏选
+    for(let j=0;j<store.questions[i].answerOBJ.trueAnswers.length;j++){
+      if(store.questions[i].answerOBJ.trueAnswers[j]&&!store.currentAnswers[i].answerOBJ[j]){
+        miss = true
+      }else if(!store.questions[i].answerOBJ.trueAnswers[j]&&store.currentAnswers[i].answerOBJ[j]){
+        incorrect = true
+        break;
+      }
+    }
+    console.log(miss)
+    console.log(incorrect)
+    //根据检测情况确定分数
+    if(incorrect){
+      store.currentAnswers[i].score = 0
+      store.currentAnswers[i].comment = '错选'
+    }else if(miss){
+      store.currentAnswers[i].comment = '漏选'
+      if(store.questions[i].answerOBJ.model=='mulitiPart'){
+        store.currentAnswers[i].score = store.questions[i].answerOBJ.scorePart
+      }else{
+        store.currentAnswers[i].score = 0
+      }
+    }else{
+      store.currentAnswers[i].score = store.questions[i].score
+      store.currentAnswers[i].comment = '正确'
+    }
+  }
+  //填空题检测
+  function checkBlank(i:number){
+    for(let j=0;j<store.currentAnswers[i].answerOBJ.blanks.length;j++){//遍历每个空
+      for(let k=0;k<store.questions[i].answerOBJ.trueAnswers[j].length;k++){//遍历每个空的可能答案
+        if(store.currentAnswers[i].answerOBJ.blanks[j]===store.questions[i].answerOBJ.trueAnswers[j][k]){
+          store.currentAnswers[i].answerOBJ.scores[j] = store.questions[i].answerOBJ.scores[j]
+          store.currentAnswers[i].score += store.currentAnswers[i].answerOBJ.scores[j]
+          break;
+        }
+      }
+    }
+  }
+  //编程题检测
+  function checkCode(i:number){
+    for(let j=0;j<store.questions[i].answerOBJ.checks.length;j++){
+      switch(store.questions[i].answerOBJ.modules[j]){
+        case 'text':textCheck(i,j);break;
+        case 'reg':regCheck(i,j);break;
+        case 'ast':astCheck(i,j);break;
+      }
+      store.currentAnswers[i].score += store.currentAnswers[i].answerOBJ.scores[j]
+    }
+  }
+  //text匹配
+  function textCheck(i:number,j:number){
+    let result=""
+    try{
+      result = eval(store.currentAnswers[i].answerOBJ.code+store.questions[i].answerOBJ.checks[j]).toString()
+    }catch(error){
+      store.currentAnswers[i].answerOBJ.scores[j] = 0
+      return
+    }
+    if(result===store.questions[i].answerOBJ.trueAnswers[j]){
+      store.currentAnswers[i].answerOBJ.scores[j] = store.questions[i].answerOBJ.scores[j]
+    }else{
+      store.currentAnswers[i].answerOBJ.scores[j] = 0
+    }
+  }
+  //reg匹配
+  function regCheck(i:number,j:number){
+    let result=""
+    try{
+      result = eval(store.currentAnswers[i].answerOBJ.code+store.questions[i].answerOBJ.checks[j]).toString()
+    }catch(error){
+      store.currentAnswers[i].answerOBJ.scores[j] = 0
+      return
+    }
+    let reg = new RegExp(store.questions[i].answerOBJ.trueAnswers[j])
+    if(reg.test(result)){
+      store.currentAnswers[i].answerOBJ.scores[j] = store.questions[i].answerOBJ.scores[j]
+    }else{
+      store.currentAnswers[i].answerOBJ.scores[j] = 0
+    }
+  }
+  //ast匹配
+  function astCheck(i:number,j:number){
+    const ast = tsquery.ast(store.currentAnswers[i].answerOBJ.code);
+    const nodes = tsquery(ast, store.questions[i].answerOBJ.checks[j]);
+    if(nodes.length){
+      store.currentAnswers[i].answerOBJ.scores[j] = store.questions[i].answerOBJ.scores[j]
+    }else{
+      store.currentAnswers[i].answerOBJ.scores[j] = 0
+    }
+  }
   //提交考试
   async function submitExam(){
     console.log("submitExam()")
-    store.OBJToString()
+    checkAnswer()//自动检测
+    store.OBJToString()//答案对象储存为JSON
     // 添加结束时间
     store.currentExam.finishTime = store.getDateTime()
     // 上传考试信息
@@ -340,6 +442,16 @@
     store.currentPaperId = -1
     store.hasCreatedAnswer = false
   }
+  //如果是单选题，点击某选项之后，清除已选择的其他选项
+  function singleChoice(i:number,j:number){
+    if(store.questions[i].answerOBJ.model=='radio'){
+      for(let k=0;k<store.currentAnswers[i].answerOBJ.length;k++){
+        if(k!=j){
+          store.currentAnswers[i].answerOBJ[k] = false
+        }
+      }
+    }
+  }
 </script>
 
 <template>
@@ -358,25 +470,25 @@
         <template v-for="question,index in store.questions" :key="question.id">
           <div class="question">
             <div class="question-head">
-              <span>{{ questionHead(index) }}</span>
+              <span>{{ store.questionHead(index) }}</span>
             </div>
             <!-- 选择题 -->
             <div class="answer-container" v-if="question.currentAnswerType=='choice'">
               <div v-for="_,i in store.questions[index].answerOBJ.choices">
                 <span>{{ store.questions[index].answerOBJ.choices[i] }}</span>
-                <input type="checkbox" v-model="store.currentAnswers[index].answerOBJ[i]">
+                <input type="checkbox" v-model="store.currentAnswers[index].answerOBJ[i]" @change="singleChoice(index,i)">
               </div>
             </div>
             <!-- 填空题 -->
             <div class="answer-container" v-if="question.currentAnswerType=='blank'">
-              <div v-for="_,i in store.currentAnswers[index].answerOBJ">
+              <div v-for="_,i in store.currentAnswers[index].answerOBJ.blanks">
                 <span>{{ '('+(i+1)+')' }}</span>
-                <input class="blank-input" type="text" v-model="store.currentAnswers[index].answerOBJ[i]">
+                <input class="blank-input" type="text" v-model="store.currentAnswers[index].answerOBJ.blanks[i]">
               </div>
             </div>
             <!-- 编程题 -->
             <div class="answer-container" v-if="question.currentAnswerType=='code'">
-              <textarea class="code-input" v-model="store.currentAnswers[index].answerOBJ"></textarea>
+              <textarea class="code-input" v-model="store.currentAnswers[index].answerOBJ.code" @keydown.tab.prevent="store.onTab"></textarea>
             </div>
             <hr/>
           </div>
