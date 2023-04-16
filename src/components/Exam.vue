@@ -343,7 +343,9 @@
   //ast匹配
   function astCheck(i:number,j:number){
     const ast = tsquery.ast(store.currentAnswers[i].answerOBJ.code);
+    console.log(ast)
     const nodes = tsquery(ast, store.questions[i].answerOBJ.checks[j]);
+    console.log(nodes)
     if(nodes.length){
       store.currentAnswers[i].answerOBJ.scores[j] = store.questions[i].answerOBJ.scores[j]
     }else{

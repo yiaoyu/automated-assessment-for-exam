@@ -65,6 +65,7 @@
   function removeBlank(i:number){
     store.questions[i].answerOBJ.trueAnswers.pop()
     store.questions[i].answerOBJ.scores.pop()
+    countScore(i)
   }
   //填空题增加和减少填空中可供匹配的答案数量
   function addBlankAnswer(i:number,j:number){
@@ -87,6 +88,7 @@
     store.questions[i].answerOBJ.trueAnswers.pop()
     store.questions[i].answerOBJ.comments.pop()
     store.questions[i].answerOBJ.scores.pop()
+    countScore(i)
   }
   //计算总分
   function countScore(index:number){

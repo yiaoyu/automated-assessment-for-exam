@@ -79,9 +79,15 @@
         <div v-if="store.studentAnswers[index].score == store.questions[index].score" class="correct">
           <span>{{ '('+store.studentAnswers[index].answerOBJ.scores.length+'/'+store.studentAnswers[index].answerOBJ.scores.length+')个用例通过' }}</span>
         </div>
-        <div v-if="store.studentAnswers[index].score != store.questions[index].score" v-for="_,i of store.studentAnswers[index].answerOBJ.scores" class="incorrect">
-          <span>{{ '(-'+store.questions[index].answerOBJ.scores[i]+')分--' }}</span>
-          <span v-if="store.studentAnswers[index].answerOBJ.scores[i]==0">{{ store.questions[index].answerOBJ.comments[i] }}</span>
+        <div v-if="store.studentAnswers[index].score != store.questions[index].score" v-for="_,i of store.studentAnswers[index].answerOBJ.scores">
+          <div v-if="store.studentAnswers[index].answerOBJ.scores[i]!=0" class="correct">
+            <span>{{ '('+store.questions[index].answerOBJ.scores[i]+')分--' }}</span>
+            <span>用例检测通过</span>
+          </div>
+          <div v-if="store.studentAnswers[index].answerOBJ.scores[i]==0" class="incorrect">
+            <span>(0)分--</span>
+            <span>{{ store.questions[index].answerOBJ.comments[i] }}</span>
+          </div>
         </div>
       </div>
       <hr/>
@@ -91,16 +97,4 @@
 
 <style scoped lang="less">
   @import "../assets/base.less";
-  .correct{
-    color: @main-color;
-    span{
-      color: @main-color;
-    }
-  }
-  .incorrect{
-    color: @warning-color;
-    span{
-      color: @warning-color;
-    }
-  }
 </style>
