@@ -45,8 +45,8 @@
     <div v-for="(answer, index) in store.studentAnswers">
       <div>
         <span :class="store.questions[index].score==store.studentAnswers[index].score?'correct':'incorrect'">
-          <span>{{ answer.comment }}</span>
           <span>{{ '('+answer.score+')分----' }}</span>
+          <span>{{ answer.comment }}</span>
         </span>
         <span>{{ store.questionHead(index) }}</span>
       </div>
@@ -97,4 +97,7 @@
 
 <style scoped lang="less">
   @import "../assets/base.less";
+  .result-container{
+    padding: 0.5rem;
+  }
 </style>

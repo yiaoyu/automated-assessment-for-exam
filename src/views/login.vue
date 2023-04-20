@@ -169,12 +169,6 @@
       </div>
     </section>
   </div>
-  <div class="console">
-    <nav>
-      <RouterLink to="/student">学生界面</RouterLink>
-      <RouterLink to="/teacher">教师界面</RouterLink>
-    </nav>
-  </div>
 </template>
 
 <style scoped lang="less">
@@ -190,7 +184,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 50rem;
+    height: 54rem;
     background-color: @background-color;
     .login-box{
       height: 25rem;

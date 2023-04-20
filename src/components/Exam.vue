@@ -268,8 +268,8 @@
         break;
       }
     }
-    console.log(miss)
-    console.log(incorrect)
+    //console.log(miss)
+    //console.log(incorrect)
     //根据检测情况确定分数
     if(incorrect){
       store.currentAnswers[i].score = 0
@@ -314,6 +314,7 @@
     let result=""
     try{
       result = eval(store.currentAnswers[i].answerOBJ.code+store.questions[i].answerOBJ.checks[j]).toString()
+      //console.log(result)
     }catch(error){
       store.currentAnswers[i].answerOBJ.scores[j] = 0
       return
@@ -343,9 +344,9 @@
   //ast匹配
   function astCheck(i:number,j:number){
     const ast = tsquery.ast(store.currentAnswers[i].answerOBJ.code);
-    console.log(ast)
+    //console.log(ast)
     const nodes = tsquery(ast, store.questions[i].answerOBJ.checks[j]);
-    console.log(nodes)
+    //console.log(nodes)
     if(nodes.length){
       store.currentAnswers[i].answerOBJ.scores[j] = store.questions[i].answerOBJ.scores[j]
     }else{
@@ -463,7 +464,8 @@
       <h3 class="header-time-limit">考试时长：{{ store.papers[store.getPaperPage(store.currentPaperId)].timeLimit }}</h3>
       <div class="header-info">{{ store.papers[store.getPaperPage(store.currentPaperId)].description }}</div>
       <button @click="startExam(store.currentPaperId)" 
-      :disabled="store.currentExam.pid!=0">
+      :disabled="store.currentExam.pid!=0"
+      v-if="store.currentExam.pid==0">
       开始作答
       </button>
     </div>
@@ -511,6 +513,14 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      .header-info{
+        padding: 1rem;
+      }
+      button{
+        width: 24rem;
+        height: 3rem;
+        font-size: 1.5rem;
+      }
     };
     .exam{
       .paper{
@@ -521,8 +531,8 @@
               background-color: azure;
             }
             .code-input{
-              width: 20rem;
-              height: 12rem;
+              width: 50rem;
+              height: 20rem;
             }
           }
         }

@@ -126,65 +126,101 @@
 <template>
   <div class="setting-container" id="student-setting1" v-if="store.currentNav=='studentInfo'&&store.currentItem==0">
     <div class="change-info">
+      <div class="title">修改个人信息</div>
       <div>用户序号：{{store.userId}}</div>
       <div>
-        <span>姓名</span>
+        <span>姓名：</span>
         <input type="text" v-model="newName">
       </div>
       <div>
-        <span>学校</span>
+        <span>学校：</span>
         <input type="text" v-model="newSchool">
       </div>
       <div>
-        <span>班级</span>
+        <span>班级：</span>
         <input type="text" v-model="newClass">
       </div>
-      <button @click="changeInfo">确认修改</button>
+      <div class="confirm-container">
+        <button @click="changeInfo" class="confirm">确认修改</button>
+      </div>
     </div>
+    <hr/>
     <div class="change-pwd">
+      <div class="title">修改密码</div>
       <div>
-        <span>请输入旧密码</span>
+        <span>请输入旧密码：</span>
         <input type="password" v-model="currentPwd">
       </div>
       <div>
-        <span>请输入新密码</span>
+        <span>请输入新密码：</span>
         <input type="password" v-model="newPwd">
       </div>
-      <button @click="changePwd">确认修改</button>
+      <div class="confirm-container">
+        <button @click="changePwd" class="confirm">确认修改</button>
+      </div>
     </div>
   </div>
   <div class="setting-container" id="teacher-setting1" v-if="store.currentNav=='teacherInfo'&&store.currentItem==0">
     <div class="change-info">
+      <div class="title">修改个人信息</div>
       <div>用户序号：{{store.userId}}</div>
       <div>
-        <span>姓名</span>
+        <span>姓名：</span>
         <input type="text" v-model="newName">
       </div>
       <div>
-        <span>学校</span>
+        <span>学校：</span>
         <input type="text" v-model="newSchool">
       </div>
       <div>
-        <span>部门</span>
+        <span>部门：</span>
         <input type="text" v-model="newDepartment">
       </div>
-      <button @click="changeInfo">确认修改</button>
+      <div class="confirm-container">
+        <button @click="changeInfo" class="confirm">确认修改</button>
+      </div>
     </div>
+    <hr/>
     <div class="change-pwd">
+      <div class="title">修改密码</div>
       <div>
-        <span>请输入旧密码</span>
+        <span>请输入旧密码：</span>
         <input type="password" v-model="currentPwd">
       </div>
       <div>
-        <span>请输入新密码</span>
+        <span>请输入新密码：</span>
         <input type="password" v-model="newPwd">
       </div>
-      <button @click="changePwd">确认修改</button>
+      <div class="confirm-container">
+        <button @click="changePwd" class="confirm">确认修改</button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="less">
   @import "../assets/base.less";
-  
+  .setting-container{
+    padding: 1rem;
+    .change-info, .change-pwd{
+      display:flex;
+      flex-direction: column;
+      align-items: center;
+      div{
+        padding-bottom: 1rem;
+      }
+    }
+    .title{
+      text-align: center;
+    }
+    .confirm-container{
+      .confirm{
+        width: 6rem;
+      }
+    }
+    input{
+      background-color: @background-color-light;
+      width: 24rem;
+    }
+  }
 </style>

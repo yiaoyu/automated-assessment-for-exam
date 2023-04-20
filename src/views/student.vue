@@ -26,7 +26,7 @@
 <style scoped lang="less">
   @import "../assets/base.less";
   .display{
-    min-height: 50rem;
+    min-height: 51rem;
     background-color: @background-color;
     .row-display{
       display: flex;

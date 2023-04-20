@@ -84,8 +84,8 @@
     <div v-for="(answer, index) in store.studentAnswers">
       <div>
         <span :class="store.questions[index].score==store.studentAnswers[index].score?'correct':'incorrect'">
-          <span>{{ answer.comment }}</span>
           <span>{{ '('+answer.score+')分----' }}</span>
+          <span>{{ answer.comment }}</span>
         </span>
         <span>{{ store.questionHead(index) }}</span>
       </div>
@@ -119,13 +119,13 @@
           <span>{{ '('+store.studentAnswers[index].answerOBJ.scores.length+'/'+store.studentAnswers[index].answerOBJ.scores.length+')个用例通过' }}</span>
         </div>
         <div v-if="store.studentAnswers[index].score != store.questions[index].score" v-for="_,i in store.studentAnswers[index].answerOBJ.scores">
-          <div v-if="store.studentAnswers[index].answerOBJ.scores[i]==0" class="correct">
-            <span>{{ '(-'+store.questions[index].answerOBJ.scores[i]+')分--' }}</span>
-            <span>{{ store.questions[index].answerOBJ.comments[i] }}</span>
-          </div>
-          <div v-if="store.studentAnswers[index].answerOBJ.scores[i]!=0" class="incorrect">
+          <div v-if="store.studentAnswers[index].answerOBJ.scores[i]!=0" class="correct">
             <span>{{ '('+store.questions[index].answerOBJ.scores[i]+')分--' }}</span>
             <span>用例检测通过</span>
+          </div>
+          <div v-if="store.studentAnswers[index].answerOBJ.scores[i]==0" class="incorrect">
+            <span>{{ '(-'+store.questions[index].answerOBJ.scores[i]+')分--' }}</span>
+            <span>{{ store.questions[index].answerOBJ.comments[i] }}</span>
           </div>
         </div>
       </div>
@@ -165,5 +165,6 @@
     margin-left: 16rem;
     min-height: 50rem;
     background-color: @background-color;
+    padding: 0.5rem;
   }
 </style>

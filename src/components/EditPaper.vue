@@ -272,61 +272,70 @@
 
 <template>
   <div class="edit-paper-container" v-if="store.currentPaperId!=-1">
-    <h1>edit-paper</h1>
-    <div class="paper-setting">
-      <div>试卷编号：</div>
-      <div>{{store.papers[store.getPaperPage(store.currentPaperId)].id}}</div>
+    <div class="edit-console">
+      <button @click="removePaper" class="delete">删除试卷</button>
+      <button @click="changePaper">保存试卷信息</button>
+      <button @click="addQuestion" v-if="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime===null">增加题目</button>
+      <button @click="saveAllQuestion">保存修改</button>
+      <button @click="publish" v-if="store.papers[store.getPaperPage(store.currentPaperId)].closed==='true'||store.papers[store.getPaperPage(store.currentPaperId)].releaseTime === null">发布试卷</button>
+      <button @click="suppress" v-if="store.papers[store.getPaperPage(store.currentPaperId)].closed==='false'" class="delete">结束考试</button>
     </div>
     <div class="paper-setting">
-      <div>出题人编号：</div>
-      <div>{{store.papers[store.getPaperPage(store.currentPaperId)].tid}}</div>
+      <span>试卷编号：</span>
+      <span>{{store.papers[store.getPaperPage(store.currentPaperId)].id}}</span>
     </div>
     <div class="paper-setting">
-      <div>试卷题目</div>
+      <span>出题人编号：</span>
+      <span>{{store.papers[store.getPaperPage(store.currentPaperId)].tid}}</span>
+    </div>
+    <div class="paper-setting">
+      <span>试卷题目：</span>
       <input type="text" v-model="store.papers[store.getPaperPage(store.currentPaperId)].title">
     </div>
     <div class="paper-setting">
-      <div>发布时间</div>
-      <div>{{ store.papers[store.getPaperPage(store.currentPaperId)].releaseTime }}</div>
+      <span>发布时间：</span>
+      <span>{{ store.papers[store.getPaperPage(store.currentPaperId)].releaseTime }}</span>
     </div>
     <div class="paper-setting">
-      <div>时间限制</div>
+      <span>时间限制：</span>
       <input type="number" v-model="store.papers[store.getPaperPage(store.currentPaperId)].timeLimit">
     </div>
     <div class="paper-setting">
-      <div>次数限制</div>
+      <span>次数限制：</span>
       <input type="number" min="0" v-model="store.papers[store.getPaperPage(store.currentPaperId)].maxTimes">
     </div>
     <div class="paper-setting">
-      <div>试卷头</div>
-      <textarea v-model="store.papers[store.getPaperPage(store.currentPaperId)].description"></textarea>
-    </div>
-    <div class="paper-setting">
-      <div>试卷类型</div>
+      <span>试卷类型：</span>
       <input type="radio" id="exam" value="exam" v-model="store.papers[store.getPaperPage(store.currentPaperId)].type"/>
       <label for="exam">考试</label>
       <input type="radio" id="exercise" value="exercise" v-model="store.papers[store.getPaperPage(store.currentPaperId)].type" />
       <label for="exercise">练习</label>
     </div>
-    <button @click="removePaper">删除试卷</button>
-    <button @click="changePaper">保存试卷信息</button>
+    <div class="paper-setting">
+      <div>试卷头：</div>
+      <textarea v-model="store.papers[store.getPaperPage(store.currentPaperId)].description"></textarea>
+    </div>
     <!-- 当前试卷未发布 -->
     <!-- 第一次发布之后无法改变题目数量 -->
     <!-- 第一次发布之后无法改变题目类型 -->
     <div class="question-container">
       <div v-for="question,index in store.questions">
-        <div>
-          <div>题号</div>
-          <div>{{question.id}}</div>
-        </div>
-        <div>
-          <div>试卷号</div>
-          <div>{{question.pid}}</div>
-        </div>
-        <div>
-          <div>该题分数</div>
-          <div>{{ question.score }}</div>
-        </div>
+        <hr/>
+        <span class="question-setting">
+          <span>题号：</span>
+          <span>{{question.id}}</span>
+        </span>
+        <span class="question-setting">
+          <span>试卷号：</span>
+          <span>{{question.pid}}</span>
+        </span>
+        <span class="question-setting">
+          <span>该题分数：</span>
+          <span>{{ question.score }}</span>
+        </span>
+        <span class="question-setting">
+          <button @click="removeQuestion(question.id)" v-if="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime===null" class="delete">删除该题目</button>
+        </span>
         <div>
           <div>题目类型</div>
           <div v-if="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime!==null">{{ question.type }}</div>
@@ -342,24 +351,24 @@
         </div>
         <!-- 选择题 -->
         <div class="choice-container" v-if="question.currentAnswerType=='choice'">
-          <div>
-            <span>题目总分数</span>
-            <input min="0" type="number" v-model="store.questions[index].score">
+          <div class="choice-setting">
+            <span>题目总分数：</span>
+            <input class="input-number" min="0" type="number" v-model="store.questions[index].score">
           </div>
-          <div>
-            <span>选不全得分:</span>
-            <input type="number" v-model="store.questions[index].answerOBJ.scorePart" @change="choiceScoreLimit(index)">
+          <div class="choice-setting">
+            <span>选不全得分：</span>
+            <input class="input-number" type="number" v-model="store.questions[index].answerOBJ.scorePart" @change="choiceScoreLimit(index)">
           </div>
-          <div v-for="_,i in store.questions[index].answerOBJ.choices">
-            <input type="text" v-model="store.questions[index].answerOBJ.choices[i]">
-            <input type="checkbox" v-model="store.questions[index].answerOBJ.trueAnswers[i]" @change="changeChoiceModel(index)">
+          <div v-for="_,i in store.questions[index].answerOBJ.choices"  class="choice-setting">
+            <input class="input-check" type="checkbox" v-model="store.questions[index].answerOBJ.trueAnswers[i]" @change="changeChoiceModel(index)">
+            <input class="input-text" type="text" v-model="store.questions[index].answerOBJ.choices[i]">
           </div>
           <button @click="addChoice(index)">增加选项</button>
-          <button @click="removeChoice(index)">减少选项</button>
+          <button @click="removeChoice(index)" class="delete">减少选项</button>
         </div>
         <!-- 填空题 -->
         <div class="blank-container" v-if="question.currentAnswerType=='blank'">
-          <div v-for="_,i in store.questions[index].answerOBJ.trueAnswers">
+          <div v-for="_,i in store.questions[index].answerOBJ.trueAnswers" class="blank-single">
             <span>分数：</span>
             <input min="0" class="blank-score" type="number" v-model="store.questions[index].answerOBJ.scores[i]" @change="countScore(index)">
             <span>正确答案：</span>
@@ -367,10 +376,10 @@
               <input class="blank-input" type="text" v-model="store.questions[index].answerOBJ.trueAnswers[i][j]">
             </div>
             <button class="blank-answer-btn" @click="addBlankAnswer(index,i)">+</button>
-            <button class="blank-answer-btn" @click="removeBlankAnswer(index,i)">-</button>
+            <button class="blank-answer-btn delete" @click="removeBlankAnswer(index,i)">-</button>
           </div>
           <button class="blank-btn" @click="addBlank(index)">增加选项</button>
-          <button class="blank-btn" @click="removeBlank(index)">减少选项</button>
+          <button class="blank-btn delete" @click="removeBlank(index)">减少选项</button>
         </div>
         <!-- 编程题 -->
         <div class="code-container" v-if="question.currentAnswerType=='code'">
@@ -386,12 +395,12 @@
               <option value="ast">抽象语法树</option>
             </select>
             <span>分数：</span>
-            <input min="0" class="blank-score" type="number" v-model="store.questions[index].answerOBJ.scores[i]" @change="countScore(index)">
+            <input min="0" class="code-score" type="number" v-model="store.questions[index].answerOBJ.scores[i]" @change="countScore(index)">
             <span>错误提示：</span>
-            <input type="text" v-model="store.questions[index].answerOBJ.comments[i]">
+            <input class="code-warn" type="text" v-model="store.questions[index].answerOBJ.comments[i]">
             <div class="code-input-container">
               <div>
-                <div>输入测试用例</div>
+                <div>输入测试用例：</div>
                 <textarea v-model="store.questions[index].answerOBJ.checks[i]" @keydown.tab.prevent="store.onTab"></textarea>
               </div>
               <div>
@@ -401,42 +410,106 @@
             </div>
           </div>
           <button class="blank-btn" @click="addCodeCheck(index)">增加检测</button>
-          <button class="blank-btn" @click="removeCodeCheck(index)">减少检测</button>
+          <button class="blank-btn delete" @click="removeCodeCheck(index)">减少检测</button>
         </div>
-        <button @click="removeQuestion(question.id)" v-if="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime===null">删除该题目</button>
       </div>
-      <button @click="addQuestion" v-if="store.papers[store.getPaperPage(store.currentPaperId)].releaseTime===null">增加题目</button>
-      <button @click="saveAllQuestion">保存修改</button>
     </div>
-    <button @click="publish" v-if="store.papers[store.getPaperPage(store.currentPaperId)].closed==='true'||store.papers[store.getPaperPage(store.currentPaperId)].releaseTime === null">发布试卷</button>
-    <button @click="suppress" v-if="store.papers[store.getPaperPage(store.currentPaperId)].closed==='false'">结束考试</button>
   </div>
 </template>
 
 <style scoped lang="less">
   @import "../assets/base.less";
-  .blank-input-container{
-    display: inline;
-  }
-  .blank-input{
-    display: inline;
-    background-color: azure;
-  }
-  .blank-score{
-    display: inline;
-    width: 3rem;
-    background-color: azure;
-  }
-  .blank-answer-btn{
-    display: inline;
-    width: 1rem;
-  }
   textarea{
     width: 20rem;
     height: 10rem;
   }
-  .code-input-container{
-    display: flex;
-
+  input{
+    background-color: @input-background-color;
+  }
+  .edit-paper-container{
+    margin: 0.5rem;
+    .paper-setting{
+      margin-bottom: 0.5rem;
+    }
+    .edit-console{
+      position: fixed;
+      top: 15%;
+      right: 5%;
+      display: flex;
+      flex-direction: column;
+      button{
+        width: 5rem;
+        height: 6rem;
+      }
+    }
+  }
+  .question-container{
+    .question-setting{
+      margin-right: 2rem;
+      button{
+        width: 8rem;
+      }
+    }
+  }
+  .choice-container{
+    .choice-setting{
+      margin-bottom: 0.5rem;
+      .input-number{
+        width: 3rem;
+      }
+      .input-text{
+        width: 30rem;
+      }
+      .input-check{
+        margin-right: 1rem;
+      }
+    }
+    button{
+      margin-left: 4rem;
+      width: 8rem;
+    }
+  }
+  .blank-container{
+    .blank-input-container{
+      display: inline;
+    }
+    .blank-input{
+      display: inline;
+      width: 8rem;
+      margin-right: 1rem;
+      background-color: @input-background-color;
+    }
+    .blank-single{
+      margin-bottom: 0.5rem;
+    }
+    .blank-score{
+      display: inline;
+      width: 3rem;
+      background-color: @input-background-color;
+    }
+    .blank-answer-btn{
+      margin-left: 0.5rem;
+      display: inline;
+      width: 1rem;
+    }
+    button{
+      margin-left: 4rem;
+      width: 8rem;
+    }
+  }
+  .code-container{
+    .code-input-container{
+      display: flex;
+    }
+    .code-score{
+      width: 3rem;
+    }
+    .code-warn{
+      width: 18rem;
+    }
+    button{
+      margin-left: 4rem;
+      width: 8rem;
+    }
   }
 </style>

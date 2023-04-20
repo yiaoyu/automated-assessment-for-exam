@@ -39,12 +39,12 @@
 <style scoped lang="less">
   @import "../assets/base.less";
   .content-container{
-    min-height: 50rem;
+    min-height: 47rem;
     height: 100%;
     margin-top: 4rem;
     margin-left: 24rem;
     width:100%;
-    background-color: @background-color-light;
+    background-color: @background-color;
     z-index: 1;
   }
 </style>
