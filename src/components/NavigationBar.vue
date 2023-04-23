@@ -66,7 +66,7 @@
       <div class="items" v-for="paper in store.papers"
       :key="paper.id" 
       @click="store.currentPaperId=paper.id">
-        <div class="item" :class="{selected:store.currentPaperId==paper.id}">
+        <div class="item" :class="{selected:store.currentPaperId==paper.id}" v-if="store.userId==paper.tid">
           {{ paper.title }}
         </div>
       </div>

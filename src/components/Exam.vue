@@ -356,6 +356,10 @@
   //提交考试
   async function submitExam(){
     console.log("submitExam()")
+    //如果是练习题则不需要教师手动发布考试结果
+    if(store.papers[store.getPaperPage(store.currentPaperId)].type=="exercise"){
+      store.currentExam.public = "yes"
+    }
     checkAnswer()//自动检测
     store.OBJToString()//答案对象储存为JSON
     // 添加结束时间

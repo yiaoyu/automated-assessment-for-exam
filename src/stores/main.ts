@@ -21,7 +21,7 @@ export const mainStore = defineStore("main", () => {
     startTime:"",
     finishTime:"",
     score:0,
-    public:"yes",
+    public:"no",
     times:0
   })
   const currentAnswers:entity.answer[] = reactive([])
@@ -83,7 +83,7 @@ export const mainStore = defineStore("main", () => {
             //身份验证通过
             break
           case "token_verify_fail":
-            window.location.replace("http://localhost:5500")
+            window.location.replace("http://localhost:5500")//如果部署在服务器上需要修改这个地址
             break
           default: window.alert(v)
         }
@@ -91,7 +91,7 @@ export const mainStore = defineStore("main", () => {
         console.log(err)
       })
     }else{
-      window.location.replace("http://localhost:5500")
+      window.location.replace("http://localhost:5500")//如果部署在服务器上需要修改这个地址
     }
   }
 

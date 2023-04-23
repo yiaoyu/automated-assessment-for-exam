@@ -44,11 +44,11 @@
     <!-- store.questions.length!=0保证promise返回之后再加载页面 -->
     <div v-for="(answer, index) in store.studentAnswers">
       <div>
+        <span>{{ store.questionHead(index) }}</span>
         <span :class="store.questions[index].score==store.studentAnswers[index].score?'correct':'incorrect'">
-          <span>{{ '('+answer.score+')分----' }}</span>
+          <span>{{ '('+answer.score+'分)' }}</span>
           <span>{{ answer.comment }}</span>
         </span>
-        <span>{{ store.questionHead(index) }}</span>
       </div>
       <!-- 选择题 -->
       <div v-if="store.questions[index].type=='choice'">
